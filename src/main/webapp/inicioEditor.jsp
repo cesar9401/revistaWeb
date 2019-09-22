@@ -1,6 +1,6 @@
 <%-- 
-    Document   : iniciar
-    Created on : Sep 14, 2019, 10:33:24 PM
+    Document   : inicioEditor
+    Created on : Sep 21, 2019, 4:23:21 PM
     Author     : cesar31
 --%>
 
@@ -10,15 +10,16 @@
 <%
     //Obtener al usuario del servlet
     Usuario tmp = (Usuario) request.getAttribute("usuario");
+    session.setAttribute("user", tmp.getIdUsuario());
 %>
+
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="css/estiloInicio.css" rel="stylesheet" type="text/css"/>
-        <title>Inicio - Revistas Web</title>
-
+        <title>Inicio - <%=tmp.getIdUsuario()%></title>
+        <link href="css/estiloInicioEditor.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
 
@@ -27,8 +28,10 @@
         </div>
 
         <div class="info">
-            <h4>Nueva Revista</h4>
+            <h4><a href="nuevaRevista.jsp">Nueva Revista</a></h4>
             <h4>Mis Revistas</h4>
+            <h4>Metodo de Pago</h4>
+            
         </div>
 
         <div class="user">
@@ -39,10 +42,5 @@
             <p>Sexo: <%=tmp.getSexo()%></p>
         </div>
 
-
     </body>
-
-
-
-
 </html>

@@ -11,15 +11,18 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Revistas Web</title>
         <link href="css/estilo.css" rel="stylesheet" type="text/css"/> 
-   </head>
+    </head>
+    
     <body>
+    <center>
         <a href="index.jsp" title="Inicio"><img src="img/index.png" width="100" alt="Inicio" title="Inicio"/></a>
-        
+
         <div>
-            <p>Registrarme como Editor</p>
+            <p><a href="registrarEditor.jsp" title="RegistrarEditor">Registrarme como Editor</a></p>
             <p><a href="registroUsuario.jsp" title="Registrarme">Registrarme</a></p>
-            <p>Iniciar Sesion</p>
+            <p><a href="iniciarSesion.jsp" title ="IniciarSesion">Iniciar Sesion</a></p>
         </div>
-        
+    </center>
     </body>
+    
 </html>

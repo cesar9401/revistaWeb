@@ -18,13 +18,12 @@ import objeto.Usuario;
 public class UsuarioDAO {
     
     private Conexion conexion = new Conexion();
-    private Usuario tmp;
     
-    public UsuarioDAO(Usuario tmp){
-        this.tmp = tmp;
+    public UsuarioDAO(){
     }
     
-    public void setUsuario(){
+    public void setUsuario(Usuario user){
+        Usuario tmp = user;
         try{
             conexion.conectar();
             String query = "INSERT INTO usuario (idUsuario, email, ubicacion, fechaNac, sexo, password, hobbies, descripcion, foto, editor) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -38,12 +37,33 @@ public class UsuarioDAO {
             setUsuario.setString(7, tmp.getHobbies());
             setUsuario.setString(8, tmp.getDescripcion());
             setUsuario.setBytes(9, tmp.getFoto());
-            setUsuario.setBoolean(10, false);
+            setUsuario.setBoolean(10, tmp.isEditor());
             setUsuario.executeUpdate();
             conexion.desconectar();
         }catch(SQLException ex){
             ex.printStackTrace();
         }
+    }
+    
+    public Usuario getUsuario(String usuario, String password){
+        Usuario tmp = null;
+        try{
+            conexion.conectar();
+            String query = "SELECT * FROM usuario WHERE idUsuario = ? AND password = ?";
+            PreparedStatement getUsuario = conexion.conectar().prepareStatement(query);
+            getUsuario.setString(1, usuario);
+            getUsuario.setString(2, password);
+            ResultSet r = getUsuario.executeQuery();
+            if(r.next()){
+                tmp = new Usuario(r.getString(1), r.getString(2), r.getString(3), r.getDate(4), r.getString(5), r.getString(6), r.getString(7), r.getString(8), r.getBoolean(10));
+                tmp.setFoto(r.getBytes(9));
+            }else{
+                tmp = null;
+            }
+        }catch(SQLException ex){
+        
+        }
+        return tmp;
     }
     
     public void listarImg(String idUsuario, HttpServletResponse response){

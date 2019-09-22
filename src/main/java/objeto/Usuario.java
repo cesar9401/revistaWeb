@@ -1,6 +1,7 @@
 
 package objeto;
 
+import java.io.InputStream;
 import java.sql.Date;
 
 /**
@@ -110,6 +111,4 @@ public class Usuario {
     public void setEditor(boolean editor) {
         this.editor = editor;
     }
-
-
 }

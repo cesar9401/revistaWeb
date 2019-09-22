@@ -1,9 +1,8 @@
 <%-- 
-    Document   : registroUsuario
-    Created on : Sep 13, 2019, 11:26:44 PM
+    Document   : registrarEditor
+    Created on : Sep 21, 2019, 1:11:00 PM
     Author     : cesar31
 --%>
-
 
 <%@page import="java.util.Calendar"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -11,12 +10,10 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Registro Editor</title>
         <link href="css/estilo.css" rel="stylesheet" type="text/css"/>
-        <title>Registrarme</title>
     </head>
     <body>
-        <a href="index.jsp" title="Inicio"><img src="img/index.png" width="100" alt="Inicio" title="Inicio"/></a>
-
     <center>
         <h1>Registrarme</h1>
         <form action="ControladorUsuario" method="post">
@@ -80,7 +77,7 @@
             <label for="pass">Contraseña</label><br/>
             <input id="pass" name="pass" type="password"/><br/><br/>
 
-            <button type="submit" name="accion" value="RegistrarUser">Registrarme</button>
+            <button type="submit" name="accion" value="RegistrarEditor">Registrarme</button>
         </form>
     </center>
 </body>
