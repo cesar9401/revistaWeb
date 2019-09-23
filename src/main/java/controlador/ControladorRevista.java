@@ -5,13 +5,18 @@
  */
 package controlador;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import modelo.RevistaDAO;
+import objeto.Revista;
 
 /**
  *
@@ -19,6 +24,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "ControladorRevista", urlPatterns = {"/ControladorRevista"})
 public class ControladorRevista extends HttpServlet {
+    
+    RevistaDAO revistaDAO = new RevistaDAO();
+    Revista revista;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -74,9 +82,35 @@ public class ControladorRevista extends HttpServlet {
             throws ServletException, IOException {
         //Write your code here
         
+        String user = (String) request.getSession().getAttribute("user");
+        String titulo = request.getParameter("titulo");
+        String categoria = request.getParameter("categoria");
+        String descripcion = request.getParameter("descripcion");
+        Double cuota = Double.parseDouble(request.getParameter("cuota"));
+        boolean reaccion = true?(request.getParameter("reaccion").equals("permitir")):false;
+        boolean comentarios = true?(request.getParameter("comentarios").equals("permitir")):false;
+        String urlPDF = request.getParameter("archivo");
+        revista = new Revista(titulo, categoria, descripcion, cuota, reaccion, comentarios, user);
+
+        File filePDF = new File(urlPDF);
+        try{
+            byte[] pdf = new byte[(int)filePDF.length()];
+            InputStream input = new FileInputStream(filePDF);
+            input.read(pdf);
+            revista.setArchivoPDF(pdf);
+        }catch(Exception ex){
+            revista.setArchivoPDF(null);
+        }
         
-
-
+        int id = revistaDAO.getId();
+        int edicion = revistaDAO.getEdicion(id);
+        revista.setIdRevista(id);
+        revista.setEdicion(edicion);
+        revista.setBloquear(true);
+        
+        revistaDAO.setRevista(revista);
+        
+        
     }
 
     /**

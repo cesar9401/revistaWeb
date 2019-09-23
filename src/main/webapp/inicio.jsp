@@ -10,6 +10,7 @@
 <%
     //Obtener al usuario del servlet
     Usuario tmp = (Usuario) request.getAttribute("usuario");
+    session.setAttribute("user", tmp.getIdUsuario());
 %>
 
 <!DOCTYPE html>
@@ -27,7 +28,6 @@
         </div>
 
         <div class="info">
-            <h4>Nueva Revista</h4>
             <h4>Mis Revistas</h4>
         </div>
 

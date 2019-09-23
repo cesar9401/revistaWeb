@@ -73,9 +73,9 @@ public class UsuarioDAO {
         InputStream inputStream = null;
         try{
             conexion.conectar();
-            PreparedStatement setImg = conexion.conectar().prepareStatement(query);
-            setImg.setString(1, idUsuario);
-            ResultSet r = setImg.executeQuery();
+            PreparedStatement getImg = conexion.conectar().prepareStatement(query);
+            getImg.setString(1, idUsuario);
+            ResultSet r = getImg.executeQuery();
             if(r.next()){
                 inputStream = new ByteArrayInputStream(r.getBytes("foto"));
             }
