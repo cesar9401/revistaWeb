@@ -9,13 +9,13 @@ import java.sql.Date;
  */
 public class MetodosDePago {
     
-    private int tarjetaCredito;
+    private long tarjetaCredito;
     private String nombre;
     private Date vencimiento;
     private String codigoSeguridad;
     private String idUsuario;
 
-    public MetodosDePago(int tarjetaCredito, String nombre, Date vencimiento, String codigoSeguridad, String idUsuario) {
+    public MetodosDePago(long tarjetaCredito, String nombre, Date vencimiento, String codigoSeguridad, String idUsuario) {
         this.tarjetaCredito = tarjetaCredito;
         this.nombre = nombre;
         this.vencimiento = vencimiento;
@@ -23,11 +23,11 @@ public class MetodosDePago {
         this.idUsuario = idUsuario;
     }
 
-    public int getTarjetaCredito() {
+    public long getTarjetaCredito() {
         return tarjetaCredito;
     }
 
-    public void setTarjetaCredito(int tarjetaCredito) {
+    public void setTarjetaCredito(long tarjetaCredito) {
         this.tarjetaCredito = tarjetaCredito;
     }
 

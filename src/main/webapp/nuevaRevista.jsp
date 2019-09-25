@@ -44,10 +44,9 @@
             <input name="archivo" id="archivo"/><br/><br/>
             
             <button type="submit" name="accion" value="NuevaRevista">Enviar Revista</button>
-            
-            
-
         </form>
+        <hr/>
+        <a href="inicioEditor.jsp">Inicio</a>
     </center>
 
 </body>

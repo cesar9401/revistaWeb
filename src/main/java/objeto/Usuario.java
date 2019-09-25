@@ -32,6 +32,15 @@ public class Usuario {
         this.editor = editor;
     }
 
+    /*
+        Constructor para admins de la Base de Datos
+    */
+    public Usuario(String idUsuario, String email, String password) {
+        this.idUsuario = idUsuario;
+        this.email = email;
+        this.password = password;
+    }
+    
     public String getIdUsuario() {
         return idUsuario;
     }

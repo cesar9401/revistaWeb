@@ -14,6 +14,7 @@
     </head>
     
     <body>
+        <p><%=session.getAttribute("user")%></p>
     <center>
         <a href="index.jsp" title="Inicio"><img src="img/index.png" width="100" alt="Inicio" title="Inicio"/></a>
 

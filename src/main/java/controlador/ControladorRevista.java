@@ -10,12 +10,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import modelo.MetodosDePagoDAO;
 import modelo.RevistaDAO;
+import objeto.MetodosDePago;
 import objeto.Revista;
 
 /**
@@ -24,9 +28,9 @@ import objeto.Revista;
  */
 @WebServlet(name = "ControladorRevista", urlPatterns = {"/ControladorRevista"})
 public class ControladorRevista extends HttpServlet {
-    
+
     RevistaDAO revistaDAO = new RevistaDAO();
-    Revista revista;
+    MetodosDePagoDAO metodosDePagoDAO = new MetodosDePagoDAO();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,7 +49,7 @@ public class ControladorRevista extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ControladorRevista</title>");            
+            out.println("<title>Servlet ControladorRevista</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ControladorRevista at " + request.getContextPath() + "</h1>");
@@ -66,7 +70,16 @@ public class ControladorRevista extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        String action = request.getParameter("accion");
+        String user = (String) request.getSession().getAttribute("user");
+        if (action.equals("newRevista")) {
+            if (metodosDePagoDAO.verificarMetodo(user)) {
+                request.getRequestDispatcher("nuevaRevista.jsp").forward(request, response);
+            } else {
+                request.getRequestDispatcher("metodoDePago.jsp").forward(request, response);
+            }
+        }
     }
 
     /**
@@ -81,46 +94,82 @@ public class ControladorRevista extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //Write your code here
-        
+
+        String action = request.getParameter("accion");
+        String user = (String) request.getSession().getAttribute("user");
+        switch (action) {
+            case "NuevaRevista":
+                NuevaRevista(request, response);
+                break;
+
+            case "RegistrarMetodo":
+                RegistarMetodo(request, response);
+                break;
+            default:
+
+                break;
+
+        }
+
+    }
+
+    public void NuevaRevista(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         String user = (String) request.getSession().getAttribute("user");
         String titulo = request.getParameter("titulo");
         String categoria = request.getParameter("categoria");
         String descripcion = request.getParameter("descripcion");
         Double cuota = Double.parseDouble(request.getParameter("cuota"));
-        boolean reaccion = true?(request.getParameter("reaccion").equals("permitir")):false;
-        boolean comentarios = true?(request.getParameter("comentarios").equals("permitir")):false;
+        boolean reaccion = true ? (request.getParameter("reaccion").equals("permitir")) : false;
+        boolean comentarios = true ? (request.getParameter("comentarios").equals("permitir")) : false;
         String urlPDF = request.getParameter("archivo");
-        revista = new Revista(titulo, categoria, descripcion, cuota, reaccion, comentarios, user);
-
+        Revista revista = new Revista(titulo, categoria, descripcion, cuota, reaccion, comentarios, user);
         File filePDF = new File(urlPDF);
-        try{
-            byte[] pdf = new byte[(int)filePDF.length()];
+        try {
+            byte[] pdf = new byte[(int) filePDF.length()];
             InputStream input = new FileInputStream(filePDF);
             input.read(pdf);
             revista.setArchivoPDF(pdf);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             revista.setArchivoPDF(null);
         }
-        
         int id = revistaDAO.getId();
         int edicion = revistaDAO.getEdicion(id);
         revista.setIdRevista(id);
         revista.setEdicion(edicion);
         revista.setBloquear(true);
-        
-        revistaDAO.setRevista(revista);
-        
-        
+
+        if (metodosDePagoDAO.verificarMetodo(user)) {
+            revistaDAO.setRevista(revista);
+            List<Revista> revistas = revistaDAO.getRevistas(user);
+            request.getSession().setAttribute("revistas", revistas);
+            request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("metodoDePago.jsp").forward(request, response);
+        }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    private void RegistarMetodo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String nombre = request.getParameter("nombre");
+        String num = request.getParameter("numero");
+        long numero = 0;
+        try {
+            numero = Long.parseLong(num);
+        } catch (NumberFormatException ex) {
 
+        }
+        int day = 1;
+        int month = Integer.parseInt(request.getParameter("mes"));
+        int year = Integer.parseInt(request.getParameter("year"));
+        Calendar fecha = Calendar.getInstance();
+        fecha.set(year, month - 1, day);
+        java.sql.Date date = new java.sql.Date(fecha.getTimeInMillis());
+        String codigo = request.getParameter("codigo");
+        String user = (String) request.getSession().getAttribute("user");
+
+        MetodosDePago tarjeta = new MetodosDePago(numero, nombre, date, codigo, user);
+
+        metodosDePagoDAO.setMetodoDePago(tarjeta);
+        request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+    }
 }

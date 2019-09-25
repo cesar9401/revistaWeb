@@ -13,6 +13,8 @@
     </head>
     <link href="css/estilo.css" rel="stylesheet" type="text/css"/>
     <body>
+        <p><%=session.getAttribute("user")%></p>
+
 
     <center>
         <div>

@@ -9,13 +9,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import modelo.RevistaDAO;
 import modelo.UsuarioDAO;
+import objeto.Revista;
 import objeto.Usuario;
 
 /**
@@ -26,7 +31,7 @@ import objeto.Usuario;
 public class ControladorUsuario extends HttpServlet {
 
     UsuarioDAO usr = new UsuarioDAO();
-    Usuario tmp;
+    RevistaDAO revista = new RevistaDAO();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -56,8 +61,29 @@ public class ControladorUsuario extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String idUsuario = request.getParameter("idUsuario");
-        usr.listarImg(idUsuario, response);
+        try {
+            String idUsuario = request.getParameter("idUsuario");
+            usr.listarImg(idUsuario, response);
+        } catch (IllegalStateException ex) {
+
+        }
+
+        try {
+            String action = request.getParameter("action");
+            switch (action) {
+                case "CerrarSesion":
+                    HttpSession session = request.getSession();
+                    session.invalidate();
+                    response.sendRedirect("index.jsp");
+                    break;
+
+                default:
+                    break;
+            }
+
+        } catch (NullPointerException ex) {
+
+        }
 
     }
 
@@ -93,9 +119,9 @@ public class ControladorUsuario extends HttpServlet {
             String descripcion = request.getParameter("descripcion");
             String hobbies = request.getParameter("hobbies");
             String urlFoto = request.getParameter("fotografia");
-            
+
             String pass = request.getParameter("pass");
-            tmp = new Usuario(usuario, email, nacionalidad, fechaNac, sexo, pass, hobbies, descripcion, false);
+            Usuario tmp = new Usuario(usuario, email, nacionalidad, fechaNac, sexo, pass, hobbies, descripcion, false);
 
             File file = new File(urlFoto);
             try {
@@ -106,7 +132,7 @@ public class ControladorUsuario extends HttpServlet {
             } catch (Exception ex) {
                 tmp.setFoto(null);
             }
-                       
+
             //Agregar usuario tmp al request
             if (accion.equals("RegistrarEditor")) {
                 tmp.setEditor(true);
@@ -128,14 +154,19 @@ public class ControladorUsuario extends HttpServlet {
 
             //Se envian los datos idUsuario y password a usuarioDAO para verificar si se encuentra registrado en la base
             //de datos
-            tmp = usr.getUsuario(user, password);
+            Usuario tmp = usr.getUsuario(user, password);
             if (tmp != null) {
                 //Agregar al usuario tmp al request
                 if (tmp.isEditor()) {
-                    request.setAttribute("usuario", tmp);
+                    //request.setAttribute("usuario", tmp);
+                    List<Revista> revistas = revista.getRevistas(user);
+                    request.getSession().setAttribute("usuario", tmp);
+                    request.getSession().setAttribute("revistas", revistas);
                     request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+
                 } else {
-                    request.setAttribute("usuario", tmp);
+                    //request.setAttribute("usuario", tmp);
+                    request.getSession().setAttribute("usuario", tmp);
                     request.getRequestDispatcher("inicio.jsp").forward(request, response);
                 }
 

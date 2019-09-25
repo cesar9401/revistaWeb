@@ -14,7 +14,9 @@
     </head>
     <body>
     <center>
-        <form action="" method="post">
+        <h1>Informacion Metodo de Pago</h1>
+        <p>Antes de continuar, necesitamos que ingrese un metodo de pago</p>
+        <form action="ControladorRevista" method="post">
             <h1>Metodo de Pago</h1><hr/>
 
             <label for="nombre">Nombre del titular</label><br/>
@@ -30,9 +32,9 @@
             <input name="year" id="year" placeholder="Año: 2019 - 2050" maxlength="4"/><br/><br/>
 
             <label for="codigo">Código de Seguridad</label><br/>
-            <input name="codigo" id="codigo" placeholder="3 digitos" maxlength="4"/><br/><br/>
+            <input name="codigo" id="codigo" placeholder="3 digitos" maxlength="3"/><br/><br/>
 
-            <button type="submit" name="accion" value="Pagar">Añadir Metodo de Pago</button>
+            <button type="submit" name="accion" value="RegistrarMetodo">Añadir Metodo de Pago</button>
             
         </form>
     </center>

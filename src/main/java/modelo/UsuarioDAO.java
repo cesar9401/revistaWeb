@@ -22,6 +22,10 @@ public class UsuarioDAO {
     public UsuarioDAO(){
     }
     
+    /*
+        Metodo para ingresar un usuario a la base de datos, recibe como parametro un objeto de
+        tipo Usuario con la informacion necesaria
+    */
     public void setUsuario(Usuario user){
         Usuario tmp = user;
         try{
@@ -41,10 +45,49 @@ public class UsuarioDAO {
             setUsuario.executeUpdate();
             conexion.desconectar();
         }catch(SQLException ex){
-            ex.printStackTrace();
+            
         }
     }
     
+    /*
+        Metodo para ingresar un administrador a la base de datos, recibe un objeto de tipo Usuario como parametro
+    */
+    public void setAdministrador(Usuario admin){
+        try{
+            conexion.conectar();
+            String query = "INSERT INTO administrador(usuarioAdmin, password, email) VALUES(?, ?, ?)";
+            PreparedStatement setAdmin = conexion.conectar().prepareStatement(query);
+            setAdmin.setString(1, admin.getIdUsuario());
+            setAdmin.setString(2, admin.getPassword());
+            setAdmin.setString(3, admin.getEmail());
+            setAdmin.executeUpdate();
+            conexion.desconectar();
+        }catch(SQLException ex){
+        
+        }
+    }
+    
+        public Usuario getAdministrador(String idUsuario, String password){
+            Usuario admin = null;
+            try{
+                String query = "SELECT * FROM administrador WHERE usuarioAdmin = ? AND password = ?";
+                PreparedStatement getAdmin = conexion.conectar().prepareStatement(query);
+                ResultSet r = getAdmin.executeQuery();
+                if(r.next()){
+                    admin = new Usuario(r.getString("usuarioAdmin"), r.getString("password"), r.getString("email"));
+                }
+            }catch(SQLException ex){
+            
+            }
+            
+            return admin;
+        }
+
+    
+    /*
+        Metodo para obtener la informacion de un usuario, recibe los parametros usuario y password
+        y devuelve un objeto de tipo Usuario.
+    */
     public Usuario getUsuario(String usuario, String password){
         Usuario tmp = null;
         try{
@@ -66,6 +109,10 @@ public class UsuarioDAO {
         return tmp;
     }
     
+    /*
+        Metodo para obtener la fotografia de perfil de algun usuario, recibe como parametros el idUsuario
+        y un objeto de tipo response para poder imprimir sobre la pagina jsp/html.
+    */
     public void listarImg(String idUsuario, HttpServletResponse response){
         String query = "SELECT * FROM usuario WHERE idUsuario = ?";
         response.setContentType("image/*");

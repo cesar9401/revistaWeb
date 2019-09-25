@@ -35,10 +35,13 @@ public class Conexion {
     
     public void desconectar(){
         try{
+            Class.forName("com.mysql.jdbc.Driver");
             connection.close();
             System.out.println("Desconectado: " + connection.getCatalog());
         }catch(SQLException ex){
             System.out.println("No se pudo cerrar la conexion");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

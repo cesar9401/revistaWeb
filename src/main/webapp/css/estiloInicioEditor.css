@@ -10,7 +10,7 @@ body{
     left: 20px;
 }
 
-.info{
+.acciones{
     position: absolute;
     top: 350px;
     left: 20px;
@@ -25,7 +25,45 @@ body{
     line-height: 5px;
 }
 
+.foto2{
+    height: 160px;
+    position: absolute;
+    left: 300px;
+    bottom:0px; 
+    top: 0px;
+}
+
+.info{
+    width: 300px;
+    position: absolute;
+    top: 250px;
+    left: 400px;
+    line-height: 5px;
+    background-color: #A9E1F2;
+}
+
+.info2{
+    width: 300px;
+    position: absolute;
+    top: 250px;
+    left: 725px;
+    line-height: 5px;
+    background-color: #A9E1F2;  
+}
+
+.ListRevistas{
+    position: absolute;
+    top: 400px;
+    left: 400px;
+    background-color: cornsilk;
+    
+}
+
 p{
     font-size: 15px;
     color: #444444;
+}
+
+h3{
+    font-size: 20px;
 }
