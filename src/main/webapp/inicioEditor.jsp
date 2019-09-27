@@ -24,11 +24,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Inicio - <%=tmp.getIdUsuario()%></title>
         <link href="css/estiloInicioEditor.css" rel="stylesheet" type="text/css"/>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
 
         <div class="foto">
-            <img src="ControladorUsuario?idUsuario=<%=tmp.getIdUsuario()%>" width="350" height="350"/>     
+            <img src="ControladorUsuario?idUsuario=<%=tmp.getIdUsuario()%>" width="350" height="360"/>     
         </div>
 
         <div class="acciones">
@@ -55,7 +56,7 @@
             <p><%=tmp.getDescripcion()%></p>
         </div>
 
-        <div class="info2">xdxxx
+        <div class="info2">
             <h3>Hobbies:</h3>
             <p><%=tmp.getHobbies()%></p>
         </div>
@@ -63,23 +64,23 @@
         <div class="ListRevistas">
             <h2>Mis Revistas </h2>
 
-            <table>
+            <table border="1px">
                 <tr>
                     <th>Titulo</th>
                     <th>Categoria</th>
                     <th>Descripcion</th>
                     <th>Edicion</th>
-                    <th>Suscripciones</th>
+                    <th>Cuota Suscripcion</th>
                 </tr>
                 <%
                     for (int i = 0; i < revistas.size(); i++) {
                 %>
                 <tr>
-                <td><%=revistas.get(i).getTituloRevista()%></td>
-                <td><%=revistas.get(i).getCategoria()%> </td>
-                <td><%=revistas.get(i).getDescripcion()%></td>
-                <td><%=revistas.get(i).getEdicion()%></td>
-                <td><%=revistas.get(i).getCuotaSuscripcion()%></td>
+                    <td><%=revistas.get(i).getTituloRevista()%></td>
+                    <td><%=revistas.get(i).getCategoria()%> </td>
+                    <td><%=revistas.get(i).getDescripcion()%></td>
+                    <td><%=revistas.get(i).getEdicion()%></td>
+                    <td><%=revistas.get(i).getCuotaSuscripcion()%></td>
                 </tr>
                 <%
                     }
@@ -90,5 +91,8 @@
             </table>
         </div>
 
+        <script src="js/jquery-3.3.1.slim.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
     </body>
 </html>

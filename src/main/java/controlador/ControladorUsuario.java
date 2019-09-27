@@ -5,19 +5,18 @@
  */
 package controlador;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 import modelo.RevistaDAO;
 import modelo.UsuarioDAO;
 import objeto.Revista;
@@ -28,6 +27,7 @@ import objeto.Usuario;
  * @author cesar31
  */
 @WebServlet(name = "ControladorUsuario", urlPatterns = {"/ControladorUsuario"})
+@MultipartConfig(maxFileSize = 16177215)
 public class ControladorUsuario extends HttpServlet {
 
     UsuarioDAO usr = new UsuarioDAO();
@@ -63,7 +63,7 @@ public class ControladorUsuario extends HttpServlet {
 
         try {
             String idUsuario = request.getParameter("idUsuario");
-            usr.listarImg(idUsuario, response);
+            usr.getImg(idUsuario, response);
         } catch (IllegalStateException ex) {
 
         }
@@ -105,76 +105,106 @@ public class ControladorUsuario extends HttpServlet {
          */
         String accion = request.getParameter("accion");
 
-        if (accion.equals("RegistrarUser") || accion.equals("RegistrarEditor")) {
-            String usuario = request.getParameter("usuario");
-            String email = request.getParameter("email");
-            int month = Integer.parseInt(request.getParameter("mes")) - 1;
-            int day = Integer.parseInt(request.getParameter("dia"));
-            int year = Integer.parseInt(request.getParameter("year"));
-            Calendar fecha = Calendar.getInstance();
-            fecha.set(year, month, day);
-            java.sql.Date fechaNac = new java.sql.Date(fecha.getTimeInMillis());
-            String nacionalidad = request.getParameter("nacionalidad");
-            String sexo = request.getParameter("sexo");
-            String descripcion = request.getParameter("descripcion");
-            String hobbies = request.getParameter("hobbies");
-            String urlFoto = request.getParameter("fotografia");
+        switch (accion) {
+            case "Registrar":
+                registrarUsuario(request, response);
+                break;
 
-            String pass = request.getParameter("pass");
-            Usuario tmp = new Usuario(usuario, email, nacionalidad, fechaNac, sexo, pass, hobbies, descripcion, false);
+            case "Iniciar":
+                iniciarSesion(request, response);
+                break;
 
-            File file = new File(urlFoto);
-            try {
-                byte[] foto = new byte[(int) file.length()];
-                InputStream input = new FileInputStream(file);
-                input.read(foto);
-                tmp.setFoto(foto);
-            } catch (Exception ex) {
-                tmp.setFoto(null);
-            }
+            default:
+                break;
+        }
+    }
 
-            //Agregar usuario tmp al request
-            if (accion.equals("RegistrarEditor")) {
-                tmp.setEditor(true);
-                request.setAttribute("usuario", tmp);
+    public void iniciarSesion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String user = request.getParameter("usuario");
+        String password = request.getParameter("pass");
+
+        //Se envian los datos idUsuario y password a usuarioDAO para verificar si se encuentra registrado en la base
+        //de datos
+        Usuario tmp = usr.getUsuario(user, password);
+        if (tmp != null) {
+            //Agregar al usuario tmp al request
+            if (tmp.isEditor()) {
+                //request.setAttribute("usuario", tmp);
+                List<Revista> revistas = revista.getRevistasByEditor(user);
+                request.getSession().setAttribute("usuario", tmp);
+                request.getSession().setAttribute("revistas", revistas);
                 request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
 
             } else {
-                request.setAttribute("usuario", tmp);
+                //request.setAttribute("usuario", tmp);
+                request.getSession().setAttribute("usuario", tmp);
                 request.getRequestDispatcher("inicio.jsp").forward(request, response);
             }
 
-            //Guardar al usuario tmp en la base de datos
-            usr.setUsuario(tmp);
+        } else {
+            //Si tmp = null, redireccionar a la pagina de inicio de Sesion
+            request.getRequestDispatcher("iniciarSesion.jsp").forward(request, response);
+        }
+    }
+
+    public void registrarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String usuario = request.getParameter("usuario");
+        String email = request.getParameter("email");
+        boolean editor = true ? (request.getParameter("tipoCuenta").equals("Editor")) : false;
+
+        int month = 0;
+        int day = 0;
+        int year = 0;
+
+        try {
+            month = Integer.parseInt(request.getParameter("mes")) - 1;
+            day = Integer.parseInt(request.getParameter("dia"));
+            year = Integer.parseInt(request.getParameter("year"));
+        } catch (NumberFormatException ex) {
+
+        }
+        Calendar fecha = Calendar.getInstance();
+        fecha.set(year, month, day);
+        java.sql.Date fechaNac = new java.sql.Date(fecha.getTimeInMillis());
+        String nacionalidad = request.getParameter("nacionalidad");
+        String sexo = request.getParameter("sexo");
+        String descripcion = request.getParameter("descripcion");
+        String hobbies = request.getParameter("hobbies");
+        //String urlFoto = request.getParameter("fotografia");
+
+        String pass = request.getParameter("pass");
+        Usuario tmp = new Usuario(usuario, email, nacionalidad, fechaNac, sexo, pass, hobbies, descripcion, false);
+
+        //File file = new File(urlFoto);
+        InputStream inputStream = null;
+        try {
+//                byte[] foto = new byte[(int) file.length()];
+//                InputStream input = new FileInputStream(file);
+//                input.read(foto);
+//                tmp.setFoto(foto);
+            Part filePart = request.getPart("fotografia");
+            inputStream = filePart.getInputStream();
+            tmp.setImagen(inputStream);
+        } catch (Exception ex) {
+            //tmp.setFoto(null);
+            System.out.println("excepcion foto");
         }
 
-        if (accion.equals("Iniciar")) {
-            String user = request.getParameter("usuario");
-            String password = request.getParameter("pass");
+        //Agregar usuario tmp al request
+        if (editor) {
+            tmp.setEditor(true);
+            request.getSession().setAttribute("usuario", tmp);
+            List<Revista> revistas = revista.getRevistasByEditor(tmp.getIdUsuario());
+            request.getSession().setAttribute("revistas", revistas);
+            request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
 
-            //Se envian los datos idUsuario y password a usuarioDAO para verificar si se encuentra registrado en la base
-            //de datos
-            Usuario tmp = usr.getUsuario(user, password);
-            if (tmp != null) {
-                //Agregar al usuario tmp al request
-                if (tmp.isEditor()) {
-                    //request.setAttribute("usuario", tmp);
-                    List<Revista> revistas = revista.getRevistas(user);
-                    request.getSession().setAttribute("usuario", tmp);
-                    request.getSession().setAttribute("revistas", revistas);
-                    request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
-
-                } else {
-                    //request.setAttribute("usuario", tmp);
-                    request.getSession().setAttribute("usuario", tmp);
-                    request.getRequestDispatcher("inicio.jsp").forward(request, response);
-                }
-
-            } else {
-                //Si tmp = null, redireccionar a la pagina de inicio de Sesion
-                request.getRequestDispatcher("iniciarSesion.jsp").forward(request, response);
-            }
+        } else {
+            request.getSession().setAttribute("usuario", tmp);
+            request.getRequestDispatcher("inicio.jsp").forward(request, response);
         }
+
+        //Guardar al usuario tmp en la base de datos
+        usr.setUsuario(tmp);
     }
 
     /**
@@ -186,4 +216,5 @@ public class ControladorUsuario extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
 }

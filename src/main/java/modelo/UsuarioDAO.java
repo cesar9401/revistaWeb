@@ -40,7 +40,8 @@ public class UsuarioDAO {
             setUsuario.setString(6, tmp.getPassword());
             setUsuario.setString(7, tmp.getHobbies());
             setUsuario.setString(8, tmp.getDescripcion());
-            setUsuario.setBytes(9, tmp.getFoto());
+            //setUsuario.setBytes(9, tmp.getFoto());
+            setUsuario.setBlob(9, tmp.getImagen());
             setUsuario.setBoolean(10, tmp.isEditor());
             setUsuario.executeUpdate();
             conexion.desconectar();
@@ -113,7 +114,7 @@ public class UsuarioDAO {
         Metodo para obtener la fotografia de perfil de algun usuario, recibe como parametros el idUsuario
         y un objeto de tipo response para poder imprimir sobre la pagina jsp/html.
     */
-    public void listarImg(String idUsuario, HttpServletResponse response){
+    public void getImg(String idUsuario, HttpServletResponse response){
         String query = "SELECT * FROM usuario WHERE idUsuario = ?";
         response.setContentType("image/*");
         OutputStream outputStream = null;

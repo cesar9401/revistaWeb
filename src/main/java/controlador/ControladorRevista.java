@@ -5,18 +5,18 @@
  */
 package controlador;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import modelo.MetodosDePagoDAO;
 import modelo.RevistaDAO;
 import objeto.MetodosDePago;
@@ -27,6 +27,7 @@ import objeto.Revista;
  * @author cesar31
  */
 @WebServlet(name = "ControladorRevista", urlPatterns = {"/ControladorRevista"})
+@MultipartConfig(maxFileSize = 16177215)
 public class ControladorRevista extends HttpServlet {
 
     RevistaDAO revistaDAO = new RevistaDAO();
@@ -73,12 +74,23 @@ public class ControladorRevista extends HttpServlet {
 
         String action = request.getParameter("accion");
         String user = (String) request.getSession().getAttribute("user");
-        if (action.equals("newRevista")) {
-            if (metodosDePagoDAO.verificarMetodo(user)) {
-                request.getRequestDispatcher("nuevaRevista.jsp").forward(request, response);
-            } else {
-                request.getRequestDispatcher("metodoDePago.jsp").forward(request, response);
-            }
+        switch (action) {
+            case "newRevista":
+                if (metodosDePagoDAO.verificarMetodo(user)) {
+                    request.getRequestDispatcher("nuevaRevista.jsp").forward(request, response);
+                } else {
+                    request.getRequestDispatcher("metodoDePago.jsp").forward(request, response);
+                }
+                break;
+
+            case "buscarRevistas":
+                List<Revista> revistas = revistaDAO.getRevistas();
+                request.getSession().setAttribute("revistasUser", revistas);
+                request.getRequestDispatcher("buscarRevistas.jsp").forward(request, response);
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -122,16 +134,21 @@ public class ControladorRevista extends HttpServlet {
         Double cuota = Double.parseDouble(request.getParameter("cuota"));
         boolean reaccion = true ? (request.getParameter("reaccion").equals("permitir")) : false;
         boolean comentarios = true ? (request.getParameter("comentarios").equals("permitir")) : false;
-        String urlPDF = request.getParameter("archivo");
         Revista revista = new Revista(titulo, categoria, descripcion, cuota, reaccion, comentarios, user);
-        File filePDF = new File(urlPDF);
+
+//        String urlPDF = request.getParameter("archivo");
+//        File filePDF = new File(urlPDF);
+        InputStream inputStream = null;
         try {
-            byte[] pdf = new byte[(int) filePDF.length()];
-            InputStream input = new FileInputStream(filePDF);
-            input.read(pdf);
-            revista.setArchivoPDF(pdf);
+            Part filePart = request.getPart("archivo");
+            inputStream = filePart.getInputStream();
+            revista.setRevistaPDF(inputStream);
+//            byte[] pdf = new byte[(int) filePDF.length()];
+//            InputStream input = new FileInputStream(filePDF);
+//            input.read(pdf);
+//            revista.setArchivoPDF(pdf);
         } catch (Exception ex) {
-            revista.setArchivoPDF(null);
+//            revista.setArchivoPDF(null);
         }
         int id = revistaDAO.getId();
         int edicion = revistaDAO.getEdicion(id);
@@ -141,9 +158,10 @@ public class ControladorRevista extends HttpServlet {
 
         if (metodosDePagoDAO.verificarMetodo(user)) {
             revistaDAO.setRevista(revista);
-            List<Revista> revistas = revistaDAO.getRevistas(user);
+            List<Revista> revistas = revistaDAO.getRevistasByEditor(user);
             request.getSession().setAttribute("revistas", revistas);
-            request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+            //request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+            response.sendRedirect("inicioEditor.jsp");
         } else {
             request.getRequestDispatcher("metodoDePago.jsp").forward(request, response);
         }

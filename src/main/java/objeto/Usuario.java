@@ -17,6 +17,7 @@ public class Usuario {
     private String password;
     private String hobbies;
     private String descripcion;
+    private InputStream imagen;
     private byte[] foto;
     private boolean editor;
 
@@ -109,6 +110,14 @@ public class Usuario {
         return foto;
     }
 
+    public InputStream getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(InputStream imagen) {
+        this.imagen = imagen;
+    }
+    
     public void setFoto(byte[] foto) {
         this.foto = foto;
     }

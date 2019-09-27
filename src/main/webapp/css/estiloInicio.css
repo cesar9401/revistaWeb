@@ -1,21 +1,20 @@
-
 body{
     background: url(../img/revistas.jpg);
     background-attachment: fixed;
 }
 
 .foto{
-    width: 350px;
+    width: 30px;
     position: absolute;
-    top: 0px;
+    top: 10px;
     left: 20px;
 }
 
-.info{
+.acciones{
     position: absolute;
     top: 350px;
     left: 20px;
-    
+    line-height: 5px;
 }
 
 .user{
@@ -26,7 +25,39 @@ body{
     line-height: 5px;
 }
 
+.foto2{
+    height: 160px;
+    position: absolute;
+    left: 300px;
+    bottom:0px; 
+    top: 0px;
+}
+
+.info{
+    width: 300px;
+    position: absolute;
+    top: 250px;
+    left: 400px;
+    line-height: 15px;
+    background-color: #A9E1F2;
+}
+
+.info2{
+    width: 300px;
+    position: absolute;
+    top: 250px;
+    left: 725px;
+    line-height: 15px;
+    background-color: #A9E1F2;  
+}
+
+
+
 p{
     font-size: 15px;
     color: #444444;
+}
+
+h3{
+    font-size: 20px;
 }

@@ -14,7 +14,7 @@
     </head>
     <body>
     <center>
-        <form action="ControladorRevista" method="post">
+        <form action="ControladorRevista" method="post" enctype="multipart/form-data">
             <h1>Nueva Revista</h1><hr/>
             <label for="titulo">Titulo</label><br/>
             <input name="titulo" id="titulo"/><br/><br/>
@@ -41,7 +41,7 @@
             </select><br/><br/>
             
             <label for="archivo">Archivo PDF</label><br/>
-            <input name="archivo" id="archivo"/><br/><br/>
+            <input type="file" name="archivo" id="archivo"/><br/><br/>
             
             <button type="submit" name="accion" value="NuevaRevista">Enviar Revista</button>
         </form>

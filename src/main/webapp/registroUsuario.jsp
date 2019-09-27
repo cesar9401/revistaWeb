@@ -12,19 +12,28 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="css/estilo.css" rel="stylesheet" type="text/css"/>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
+
         <title>Registrarme</title>
     </head>
     <body>
         <a href="index.jsp" title="Inicio"><img src="img/index.png" width="100" alt="Inicio" title="Inicio"/></a>
 
     <center>
+
         <h1>Registrarme</h1>
-        <form action="ControladorUsuario" method="post">
+        <form action="ControladorUsuario" method="post" enctype="multipart/form-data">
             <label for="usuario">Usuario:</label><br/>
             <input id="usuario" name="usuario"/><br/><br/>
 
             <label for="email">Email:</label><br/>
             <input type="email" id="email" name="email"/><br/><br/>
+
+            <label for="tipoCuenta">Tipo de Cuenta </label>
+            <select name="tipoCuenta">
+                <option>Usuario</option>
+                <option>Editor</option>
+            </select><br/><br/>
 
             <label for="fecha">Fecha de Nacimiento</label><br/><br/>
             <label for="mes">Mes</label>
@@ -75,13 +84,21 @@
             <textarea id="hobbies" name="hobbies" ></textarea><br/><br/>
 
             <label for="fotografia">Fotografia</label><br/>
-            <input id="fotografia" name="fotografia"/><br/><br/>
+            <input type="file" id="fotografia" name="fotografia"/><br/><br/>
 
             <label for="pass">Contraseña</label><br/>
             <input id="pass" name="pass" type="password"/><br/><br/>
 
-            <button type="submit" name="accion" value="RegistrarUser">Registrarme</button>
+            <button type="submit" name="accion" value="Registrar">Registrame</button>
         </form>
+            <hr/>
+            <a href="index.jsp">Inicio</a>
     </center>
+    
+    
+
+    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </body>
 </html>

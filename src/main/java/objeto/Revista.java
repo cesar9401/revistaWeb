@@ -1,6 +1,7 @@
 
 package objeto;
 
+import java.io.InputStream;
 import java.sql.Date;
 
 /**
@@ -12,6 +13,7 @@ public class Revista{
     private int idRevista;
     private String tituloRevista;
     private byte[] archivoPDF;
+    private InputStream revistaPDF;
     private String categoria;
     private String descripcion;
     private int edicion;
@@ -57,6 +59,14 @@ public class Revista{
         this.archivoPDF = archivoPDF;
     }
 
+    public InputStream getRevistaPDF() {
+        return revistaPDF;
+    }
+
+    public void setRevistaPDF(InputStream revistaPDF) {
+        this.revistaPDF = revistaPDF;
+    }
+    
     public String getCategoria() {
         return categoria;
     }

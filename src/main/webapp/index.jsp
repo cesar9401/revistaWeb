@@ -10,7 +10,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Revistas Web</title>
-        <link href="css/estilo.css" rel="stylesheet" type="text/css"/> 
+        <link href="css/estilo.css" rel="stylesheet" type="text/css"/>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
     </head>
     
     <body>
@@ -19,11 +20,16 @@
         <a href="index.jsp" title="Inicio"><img src="img/index.png" width="100" alt="Inicio" title="Inicio"/></a>
 
         <div>
-            <p><a href="registrarEditor.jsp" title="RegistrarEditor">Registrarme como Editor</a></p>
             <p><a href="registroUsuario.jsp" title="Registrarme">Registrarme</a></p>
             <p><a href="iniciarSesion.jsp" title ="IniciarSesion">Iniciar Sesion</a></p>
         </div>
     </center>
+    
+    
+    
+    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     </body>
     
 </html>

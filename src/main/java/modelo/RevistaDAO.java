@@ -73,7 +73,8 @@ public class RevistaDAO {
                 PreparedStatement setRevista = conexion.conectar().prepareStatement(query);
                 setRevista.setInt(1, revista.getIdRevista());
                 setRevista.setString(2, revista.getTituloRevista());
-                setRevista.setBytes(3, revista.getArchivoPDF());
+                //setRevista.setBytes(3, revista.getArchivoPDF());
+                setRevista.setBlob(3, revista.getRevistaPDF());
                 setRevista.setString(4, revista.getCategoria());
                 setRevista.setString(5, revista.getDescripcion());
                 setRevista.setInt(6, revista.getEdicion());
@@ -91,7 +92,8 @@ public class RevistaDAO {
                 setEdicion.setInt(1, idEdicion);
                 setEdicion.setInt(2, revista.getIdRevista());
                 setEdicion.setInt(3, revista.getEdicion());
-                setEdicion.setBytes(4, revista.getArchivoPDF());
+                //setEdicion.setBytes(4, revista.getArchivoPDF());
+                setEdicion.setBlob(4, revista.getRevistaPDF());
                 setEdicion.executeUpdate();
 
                 conexion.conectar().commit();
@@ -109,7 +111,7 @@ public class RevistaDAO {
         Metodo para devolver un List<Revista> con todas las revistas de algun editor, recibe como parametro el idUsuario
         del editor.
      */
-    public List<Revista> getRevistas(String idUsuario) {
+    public List<Revista> getRevistasByEditor(String idUsuario) {
         List<Revista> revistas = new ArrayList<>();
         Revista tmp;
         try {
@@ -117,6 +119,46 @@ public class RevistaDAO {
             PreparedStatement getRevistas = conexion.conectar().prepareStatement(query);
             getRevistas.setString(1, idUsuario);
             ResultSet r = getRevistas.executeQuery();
+            while (r.next()) {
+                //write your code here
+                int id = r.getInt("idRevista");
+                String titulo = r.getString("tituloRevista");
+                byte[] pdf = r.getBytes("archivoPdf");
+                String categoria = r.getString("categoria");
+                String descripcion = r.getString("descripcion");
+                int edicion = r.getInt("edicion");
+                double cuota = r.getDouble("cuotaSuscripcion");
+                boolean reaccion = r.getBoolean("reaccion");
+                boolean comentarios = r.getBoolean("comentarios");
+                java.sql.Date date = r.getDate("fechaPubl");
+                int suscripciones = r.getInt("suscripciones");
+                boolean bloquear = r.getBoolean("bloquear");
+                String user = r.getString("usuario_idUsuario");
+
+                tmp = new Revista(titulo, categoria, descripcion, cuota, reaccion, comentarios, user);
+                tmp.setIdRevista(id);
+                tmp.setArchivoPDF(pdf);
+                tmp.setEdicion(edicion);
+                tmp.setFechaPublicacion(date);
+                tmp.setSuscripciones(suscripciones);
+                tmp.setBloquear(bloquear);
+
+                revistas.add(tmp);
+            }
+        } catch (SQLException ex) {
+
+        }
+
+        return revistas;
+    }
+
+    public List<Revista> getRevistas() {
+        List<Revista> revistas = new ArrayList<>();
+        Revista tmp;
+        try {
+            String query = "SELECT * FROM revista";
+            Statement getRevistas = conexion.conectar().createStatement();
+            ResultSet r = getRevistas.executeQuery(query);
             while (r.next()) {
                 //write your code here
                 int id = r.getInt("idRevista");
