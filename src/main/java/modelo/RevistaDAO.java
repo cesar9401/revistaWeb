@@ -192,6 +192,44 @@ public class RevistaDAO {
         return revistas;
     }
 
+    public Revista getRevistaById(int idRevista) {
+        Revista tmp = null;
+        try {
+            String query = "SELECT * FROM revista WHERE idRevista = ?";
+            PreparedStatement getRevista = conexion.conectar().prepareStatement(query);
+            getRevista.setInt(1, idRevista);
+            ResultSet r = getRevista.executeQuery();
+            if (r.next()) {
+                int id = r.getInt("idRevista");
+                String titulo = r.getString("tituloRevista");
+                byte[] pdf = r.getBytes("archivoPdf");
+                String categoria = r.getString("categoria");
+                String descripcion = r.getString("descripcion");
+                int edicion = r.getInt("edicion");
+                double cuota = r.getDouble("cuotaSuscripcion");
+                boolean reaccion = r.getBoolean("reaccion");
+                boolean comentarios = r.getBoolean("comentarios");
+                java.sql.Date date = r.getDate("fechaPubl");
+                int suscripciones = r.getInt("suscripciones");
+                boolean bloquear = r.getBoolean("bloquear");
+                String user = r.getString("usuario_idUsuario");
+
+                tmp = new Revista(titulo, categoria, descripcion, cuota, reaccion, comentarios, user);
+                tmp.setIdRevista(id);
+                tmp.setArchivoPDF(pdf);
+                tmp.setEdicion(edicion);
+                tmp.setFechaPublicacion(date);
+                tmp.setSuscripciones(suscripciones);
+                tmp.setBloquear(bloquear);
+
+            }
+        } catch (SQLException ex) {
+
+        }
+
+        return tmp;
+    }
+
     /*
         Metodo para obtener el idCorrespondiente para cada version de cada revista en la tabla edicionesRevistas
      */

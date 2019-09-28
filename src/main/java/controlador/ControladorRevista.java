@@ -85,6 +85,12 @@ public class ControladorRevista extends HttpServlet {
 
             case "buscarRevistas":
                 List<Revista> revistas = revistaDAO.getRevistas();
+                for (int i = 0; i < revistas.size(); i++) {
+                    if(revistas.get(i).isBloquear()){
+                        revistas.remove(i);
+                        i = i - 1;
+                    }
+                }
                 request.getSession().setAttribute("revistasUser", revistas);
                 request.getRequestDispatcher("buscarRevistas.jsp").forward(request, response);
                 break;
@@ -116,6 +122,10 @@ public class ControladorRevista extends HttpServlet {
 
             case "RegistrarMetodo":
                 RegistarMetodo(request, response);
+                break;
+                
+            case "ProcesarRevista":
+                
                 break;
             default:
 
@@ -167,7 +177,7 @@ public class ControladorRevista extends HttpServlet {
         }
     }
 
-    private void RegistarMetodo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void RegistarMetodo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String nombre = request.getParameter("nombre");
         String num = request.getParameter("numero");
         long numero = 0;
@@ -189,5 +199,12 @@ public class ControladorRevista extends HttpServlet {
 
         metodosDePagoDAO.setMetodoDePago(tarjeta);
         request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+    }
+    
+    public void ProcesarRevista(HttpServletRequest request, HttpServletResponse response){
+        Double cuotaPorDia = Double.parseDouble(request.getParameter("cuota"));
+        Double porcentaje = Double.parseDouble(request.getParameter("porcentaje"));
+        Revista revista = (Revista) request.getAttribute("revista");
+        
     }
 }

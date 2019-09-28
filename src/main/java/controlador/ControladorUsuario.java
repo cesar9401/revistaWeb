@@ -142,8 +142,24 @@ public class ControladorUsuario extends HttpServlet {
             }
 
         } else {
-            //Si tmp = null, redireccionar a la pagina de inicio de Sesion
-            request.getRequestDispatcher("iniciarSesion.jsp").forward(request, response);
+            //Si tmp == null, los datos pueden corresponder a un administrador
+            Usuario admin = usr.getAdministrador(user, password);
+
+            if (admin != null) {
+                request.getSession().setAttribute("admin", admin);
+                List<Revista> revistas = revista.getRevistas();
+                for (int i = 0; i < revistas.size(); i++) {
+                    if (!revistas.get(i).isBloquear()) {
+                        revistas.remove(i);
+                        i = i - 1;
+                    }
+                }
+                request.getSession().setAttribute("revistas", revistas);
+                request.getRequestDispatcher("inicioAdministrador.jsp").forward(request, response);
+            } else {
+                //Si tmp==null && admin==null, se redirige a la pagina de inicio de Sesion
+                request.getRequestDispatcher("iniciarSesion.jsp").forward(request, response);
+            }
         }
     }
 

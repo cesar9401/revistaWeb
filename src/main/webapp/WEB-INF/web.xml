@@ -4,9 +4,17 @@
         <servlet-name>ControllerImg</servlet-name>
         <servlet-class>controlador.ControllerImg</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RevistasController</servlet-name>
+        <servlet-class>controlador.RevistasController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ControllerImg</servlet-name>
         <url-pattern>/ControllerImg</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RevistasController</servlet-name>
+        <url-pattern>/RevistasController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

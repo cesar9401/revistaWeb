@@ -24,6 +24,7 @@
             for (int i = 0; i < revistas.size(); i++) {
                     %>
                     <p><%=revistas.get(i).getTituloRevista() %></p>
+                    <p><%=revistas.get(i).isBloquear() %></p>
                     <%
                 }
         %>

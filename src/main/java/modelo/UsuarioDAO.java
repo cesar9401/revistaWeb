@@ -1,5 +1,5 @@
-
 package modelo;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -16,19 +16,19 @@ import objeto.Usuario;
  * @author cesar31
  */
 public class UsuarioDAO {
-    
+
     private Conexion conexion = new Conexion();
-    
-    public UsuarioDAO(){
+
+    public UsuarioDAO() {
     }
-    
+
     /*
         Metodo para ingresar un usuario a la base de datos, recibe como parametro un objeto de
         tipo Usuario con la informacion necesaria
-    */
-    public void setUsuario(Usuario user){
+     */
+    public void setUsuario(Usuario user) {
         Usuario tmp = user;
-        try{
+        try {
             conexion.conectar();
             String query = "INSERT INTO usuario (idUsuario, email, ubicacion, fechaNac, sexo, password, hobbies, descripcion, foto, editor) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement setUsuario = conexion.conectar().prepareStatement(query);
@@ -45,16 +45,16 @@ public class UsuarioDAO {
             setUsuario.setBoolean(10, tmp.isEditor());
             setUsuario.executeUpdate();
             conexion.desconectar();
-        }catch(SQLException ex){
-            
+        } catch (SQLException ex) {
+
         }
     }
-    
+
     /*
         Metodo para ingresar un administrador a la base de datos, recibe un objeto de tipo Usuario como parametro
-    */
-    public void setAdministrador(Usuario admin){
-        try{
+     */
+    public void setAdministrador(Usuario admin) {
+        try {
             conexion.conectar();
             String query = "INSERT INTO administrador(usuarioAdmin, password, email) VALUES(?, ?, ?)";
             PreparedStatement setAdmin = conexion.conectar().prepareStatement(query);
@@ -63,85 +63,86 @@ public class UsuarioDAO {
             setAdmin.setString(3, admin.getEmail());
             setAdmin.executeUpdate();
             conexion.desconectar();
-        }catch(SQLException ex){
-        
+        } catch (SQLException ex) {
+
         }
     }
-    
-        public Usuario getAdministrador(String idUsuario, String password){
-            Usuario admin = null;
-            try{
-                String query = "SELECT * FROM administrador WHERE usuarioAdmin = ? AND password = ?";
-                PreparedStatement getAdmin = conexion.conectar().prepareStatement(query);
-                ResultSet r = getAdmin.executeQuery();
-                if(r.next()){
-                    admin = new Usuario(r.getString("usuarioAdmin"), r.getString("password"), r.getString("email"));
-                }
-            }catch(SQLException ex){
-            
+
+    public Usuario getAdministrador(String idUsuario, String password) {
+        Usuario admin = null;
+        try {
+            String query = "SELECT * FROM administrador WHERE usuarioAdmin = ? AND password = ?";
+            PreparedStatement getAdmin = conexion.conectar().prepareStatement(query);
+            getAdmin.setString(1, idUsuario);
+            getAdmin.setString(2,password);
+            ResultSet r = getAdmin.executeQuery();
+            if (r.next()) {
+                admin = new Usuario(r.getString("usuarioAdmin"), r.getString("email"), r.getString("password"));
             }
-            
-            return admin;
+        } catch (SQLException ex) {
+
         }
 
-    
+        return admin;
+    }
+
     /*
         Metodo para obtener la informacion de un usuario, recibe los parametros usuario y password
         y devuelve un objeto de tipo Usuario.
-    */
-    public Usuario getUsuario(String usuario, String password){
+     */
+    public Usuario getUsuario(String usuario, String password) {
         Usuario tmp = null;
-        try{
+        try {
             conexion.conectar();
             String query = "SELECT * FROM usuario WHERE idUsuario = ? AND password = ?";
             PreparedStatement getUsuario = conexion.conectar().prepareStatement(query);
             getUsuario.setString(1, usuario);
             getUsuario.setString(2, password);
             ResultSet r = getUsuario.executeQuery();
-            if(r.next()){
+            if (r.next()) {
                 tmp = new Usuario(r.getString(1), r.getString(2), r.getString(3), r.getDate(4), r.getString(5), r.getString(6), r.getString(7), r.getString(8), r.getBoolean(10));
                 tmp.setFoto(r.getBytes(9));
-            }else{
+            } else {
                 tmp = null;
             }
-        }catch(SQLException ex){
-        
+        } catch (SQLException ex) {
+
         }
         return tmp;
     }
-    
+
     /*
         Metodo para obtener la fotografia de perfil de algun usuario, recibe como parametros el idUsuario
         y un objeto de tipo response para poder imprimir sobre la pagina jsp/html.
-    */
-    public void getImg(String idUsuario, HttpServletResponse response){
+     */
+    public void getImg(String idUsuario, HttpServletResponse response) {
         String query = "SELECT * FROM usuario WHERE idUsuario = ?";
         response.setContentType("image/*");
         OutputStream outputStream = null;
         InputStream inputStream = null;
-        try{
+        try {
             conexion.conectar();
             PreparedStatement getImg = conexion.conectar().prepareStatement(query);
             getImg.setString(1, idUsuario);
             ResultSet r = getImg.executeQuery();
-            if(r.next()){
+            if (r.next()) {
                 inputStream = new ByteArrayInputStream(r.getBytes("foto"));
             }
-            
-            try{
+
+            try {
                 outputStream = response.getOutputStream();
-            }catch(Exception e){
-                
+            } catch (Exception e) {
+
             }
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
             int i = 0;
-            while((i=bufferedInputStream.read()) != -1){
+            while ((i = bufferedInputStream.read()) != -1) {
                 bufferedOutputStream.write(i);
             }
             conexion.desconectar();
-        }catch(Exception ex){
-        
+        } catch (Exception ex) {
+
         }
     }
 }
