@@ -166,6 +166,8 @@ public class ControladorUsuario extends HttpServlet {
     public void registrarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String usuario = request.getParameter("usuario");
         String email = request.getParameter("email");
+        String nombres = request.getParameter("nombre");
+        String apellidos = request.getParameter("apellido");
         boolean editor = true ? (request.getParameter("tipoCuenta").equals("Editor")) : false;
 
         int month = 0;
@@ -190,6 +192,8 @@ public class ControladorUsuario extends HttpServlet {
 
         String pass = request.getParameter("pass");
         Usuario tmp = new Usuario(usuario, email, nacionalidad, fechaNac, sexo, pass, hobbies, descripcion, false);
+        tmp.setNombres(nombres);
+        tmp.setApellidos(apellidos);
 
         //File file = new File(urlFoto);
         InputStream inputStream = null;

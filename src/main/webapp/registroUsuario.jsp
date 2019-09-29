@@ -23,12 +23,18 @@
 
         <h1>Registrarme</h1>
         <form action="ControladorUsuario" method="post" enctype="multipart/form-data">
-            <label for="usuario">Usuario:</label><br/>
+            <label for="nombre">Nombres</label><br/>
+            <input id="nombre" name="nombre"/><br/><br/>
+            
+            <label for="apellido">Apellidos</label><br/>
+            <input id="apellido" name="apellido"/><br/><br/>
+            
+            <label for="usuario">Usuario</label><br/>
             <input id="usuario" name="usuario"/><br/><br/>
 
-            <label for="email">Email:</label><br/>
+            <label for="email">Email</label><br/>
             <input type="email" id="email" name="email"/><br/><br/>
-
+            
             <label for="tipoCuenta">Tipo de Cuenta </label>
             <select name="tipoCuenta">
                 <option>Usuario</option>

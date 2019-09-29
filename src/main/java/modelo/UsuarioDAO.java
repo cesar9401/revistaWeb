@@ -30,19 +30,21 @@ public class UsuarioDAO {
         Usuario tmp = user;
         try {
             conexion.conectar();
-            String query = "INSERT INTO usuario (idUsuario, email, ubicacion, fechaNac, sexo, password, hobbies, descripcion, foto, editor) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO usuario (idUsuario, email, nombres, apellidos, ubicacion, fechaNac, sexo, password, hobbies, descripcion, foto, editor) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement setUsuario = conexion.conectar().prepareStatement(query);
             setUsuario.setString(1, tmp.getIdUsuario());
             setUsuario.setString(2, tmp.getEmail());
-            setUsuario.setString(3, tmp.getUbicacion());
-            setUsuario.setDate(4, tmp.getFechaNac());
-            setUsuario.setString(5, tmp.getSexo());
-            setUsuario.setString(6, tmp.getPassword());
-            setUsuario.setString(7, tmp.getHobbies());
-            setUsuario.setString(8, tmp.getDescripcion());
-            //setUsuario.setBytes(9, tmp.getFoto());
-            setUsuario.setBlob(9, tmp.getImagen());
-            setUsuario.setBoolean(10, tmp.isEditor());
+            setUsuario.setString(3, tmp.getNombres());
+            setUsuario.setString(4, tmp.getApellidos());
+            setUsuario.setString(5, tmp.getUbicacion());
+            setUsuario.setDate(6, tmp.getFechaNac());
+            setUsuario.setString(7, tmp.getSexo());
+            setUsuario.setString(8, tmp.getPassword());
+            setUsuario.setString(9, tmp.getHobbies());
+            setUsuario.setString(10, tmp.getDescripcion());
+            //setUsuario.setBytes(11, tmp.getFoto());
+            setUsuario.setBlob(11, tmp.getImagen());
+            setUsuario.setBoolean(12, tmp.isEditor());
             setUsuario.executeUpdate();
             conexion.desconectar();
         } catch (SQLException ex) {
@@ -100,8 +102,10 @@ public class UsuarioDAO {
             getUsuario.setString(2, password);
             ResultSet r = getUsuario.executeQuery();
             if (r.next()) {
-                tmp = new Usuario(r.getString(1), r.getString(2), r.getString(3), r.getDate(4), r.getString(5), r.getString(6), r.getString(7), r.getString(8), r.getBoolean(10));
-                tmp.setFoto(r.getBytes(9));
+                tmp = new Usuario(r.getString("idUsuario"), r.getString("email"), r.getString("ubicacion"), r.getDate("fechaNac"), r.getString("sexo"), r.getString("password"), r.getString("hobbies"), r.getString("descripcion"), r.getBoolean("editor"));
+                tmp.setFoto(r.getBytes("foto"));
+                tmp.setNombres(r.getString("nombres"));
+                tmp.setApellidos(r.getString("apellidos"));
             } else {
                 tmp = null;
             }

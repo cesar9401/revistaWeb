@@ -11,6 +11,8 @@ import java.sql.Date;
 public class Usuario {
     private String idUsuario;
     private String email;
+    private String nombres;
+    private String apellidos;
     private String ubicacion;
     private Date fechaNac;
     private String sexo;
@@ -58,6 +60,22 @@ public class Usuario {
         this.email = email;
     }
 
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+    
     public String getUbicacion() {
         return ubicacion;
     }
