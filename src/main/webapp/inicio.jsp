@@ -9,7 +9,6 @@
 
 <%
     //Obtener al usuario del servlet
-    //Usuario tmp = (Usuario) request.getAttribute("usuario");
     Usuario tmp = (Usuario) session.getAttribute("usuario");
     session.setAttribute("user", tmp.getIdUsuario());
 %>
@@ -29,7 +28,7 @@
         </div>
 
         <div class="acciones">
-            <h4>Buscar Editores</h4>
+            <h4><a href="ControladorRevista?accion=buscarEditores">Buscar Editores</a></h4>
             <h4><a href="ControladorRevista?accion=buscarRevistas" tittle="Revistas">Buscar Revistas</a></h4>
             <h4><a href="ControladorUsuario?action=CerrarSesion">Cerrar Sesion</a></h4>
 

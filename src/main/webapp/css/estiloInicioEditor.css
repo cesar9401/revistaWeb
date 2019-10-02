@@ -12,8 +12,8 @@ body{
 
 .acciones{
     position: absolute;
-    top: 350px;
-    left: 20px;
+    top: 20px;
+    right: 20px;
     line-height: 5px;
 }
 
@@ -25,20 +25,12 @@ body{
     line-height: 5px;
 }
 
-.foto2{
-    height: 160px;
-    position: absolute;
-    left: 300px;
-    bottom:0px; 
-    top: 0px;
-}
-
 .info{
     width: 300px;
     position: absolute;
     top: 250px;
     left: 400px;
-    line-height: 5px;
+    line-height: 15px;
     background-color: #A9E1F2;
 }
 
@@ -47,14 +39,14 @@ body{
     position: absolute;
     top: 250px;
     left: 725px;
-    line-height: 5px;
+    line-height: 15px;
     background-color: #A9E1F2;  
 }
 
 .ListRevistas{
     position: absolute;
     top: 400px;
-    left: 200px;
+    left: 10px;
     background-color: cornsilk;
     
 }

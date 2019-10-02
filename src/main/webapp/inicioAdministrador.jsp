@@ -62,7 +62,7 @@
                     %>
                     <tr>
                         <th scope="row"><%=revistas.get(i).getIdRevista() %></th>
-                        <td><%=revistas.get(i).getTituloRevista()%></td>
+                        <td><a href="RevistasController?showPDF=<%=revistas.get(i).getIdRevista()%>" target="_blank"><%=revistas.get(i).getTituloRevista()%></a></td>
                         <td><%=revistas.get(i).getCategoria()%></td>
                         <td><%=revistas.get(i).getDescripcion()%></td>
                         <td><%=revistas.get(i).getEdicion()%></td>
@@ -70,7 +70,7 @@
                         <td><%=revistas.get(i).isReaccion()%></td>
                         <td><%=revistas.get(i).isComentarios()%></td>
                         <td><%=revistas.get(i).getIdUsuario()%></td>
-                        <td><a href="RevistasController?action=<%=revistas.get(i).getIdRevista()%>" title="<%=revistas.get(i).getTituloRevista()%>">Procesar</a></td>
+                        <td><a href="ControladorRevista?accion=<%=revistas.get(i).getIdRevista()%>" title="<%=revistas.get(i).getTituloRevista()%>">Procesar</a></td>
                     </tr>
                     <%
                         }

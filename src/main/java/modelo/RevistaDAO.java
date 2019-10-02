@@ -1,11 +1,15 @@
 package modelo;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import objeto.Revista;
 
 /**
@@ -30,10 +34,32 @@ public class RevistaDAO {
                     id = r.getInt("idRevista") + 1;
                 }
             }
+            conexion.desconectar();
         } catch (SQLException ex) {
 
         }
         return id;
+    }
+    
+    public int getIdRegistroUtilidades(){
+        int idUtilidades = 1;
+        try{
+            conexion.conectar();
+            String query = "SELECT idRegistroUtilidades FROM registroUtilidades";
+            Statement registroUtilidades = conexion.conectar().createStatement();
+            ResultSet r = registroUtilidades.executeQuery(query);
+            while(r.next()){
+                if(idUtilidades <= r.getInt("idRegistroUtilidades")){
+                    idUtilidades = r.getInt("idRegistroUtilidades") + 1;
+                }
+            }
+            
+            conexion.desconectar();
+        }catch(SQLException ex){
+        
+        }
+            
+        return idUtilidades;
     }
 
     /*
@@ -152,6 +178,9 @@ public class RevistaDAO {
         return revistas;
     }
 
+    /*
+        Metodo para obtener un listado con todas las revistas en la base de datos
+    */
     public List<Revista> getRevistas() {
         List<Revista> revistas = new ArrayList<>();
         Revista tmp;
@@ -192,6 +221,9 @@ public class RevistaDAO {
         return revistas;
     }
 
+    /*
+        Metodo para obtener una revista segun el idRevista, devuelve un objeto del tipo Revista
+    */
     public Revista getRevistaById(int idRevista) {
         Revista tmp = null;
         try {
@@ -251,5 +283,78 @@ public class RevistaDAO {
         }
 
         return idEdicion;
+    }
+
+    /*
+        Metodo para regresar el archivo pdf que solicite el usuario y poder leerlo en pantalla
+    */
+    public void getPdf(int idRevista, HttpServletResponse response) throws IOException {
+        response.setContentType("application/pdf");
+        InputStream inputStream = null;
+
+        try {
+            conexion.conectar();
+            String query = "SELECT archivoPdf FROM revista WHERE idRevista = ?";
+            PreparedStatement getPdf = conexion.conectar().prepareStatement(query);
+            getPdf.setInt(1, idRevista);
+            ResultSet r = getPdf.executeQuery();
+            if (r.next()) {
+                inputStream = new ByteArrayInputStream(r.getBytes("archivoPdf"));
+            }
+            int tamañoInput = inputStream.available();
+            byte[] datosPDF = new byte[tamañoInput];
+            inputStream.read(datosPDF, 0, tamañoInput);
+            
+            response.getOutputStream().write(datosPDF);
+            inputStream.close();
+            getPdf.close();
+            r.close();
+            conexion.desconectar();
+        } catch (SQLException ex) {
+
+        }
+    }
+    
+    /*
+        Metodo para procesar revistas, el administrador establece el porcentaje que le corresponde al editor
+        y al dueño de la pagina asi como tambien la cuota para mantenimiento de la pagina
+    */
+    public void setProcesarRevista(Revista revista, Double porcentaje, Double cuotaDia, int idUtilidades){
+        try{
+            conexion.conectar();
+            try{
+                conexion.conectar().setAutoCommit(false);
+                String queryRevista = "UPDATE revista SET fechaPubl = ?, bloquear = ? WHERE idRevista = ?";
+                PreparedStatement updateRevista = conexion.conectar().prepareStatement(queryRevista);
+                updateRevista.setDate(1, revista.getFechaPublicacion());
+                updateRevista.setBoolean(2, revista.isBloquear());
+                updateRevista.setInt(3, revista.getIdRevista());
+                updateRevista.executeUpdate();
+                
+                String queryUtilidades = "INSERT INTO registroUtilidades(idRegistroUtilidades, revista_idRevista, porcentaje, costoDia) VALUES(?, ?, ?, ?)";
+                PreparedStatement setRegistro = conexion.conectar().prepareStatement(queryUtilidades);
+                setRegistro.setInt(1, idUtilidades);
+                setRegistro.setInt(2, revista.getIdRevista());
+                setRegistro.setDouble(3, porcentaje);
+                setRegistro.setDouble(4, cuotaDia);
+                setRegistro.executeUpdate();
+                
+                String queryEdiciones = "UPDATE edicionesRevistas SET fechaPublicacion = ? WHERE revista_idRevista = ? AND edicionRevista = ?";
+                PreparedStatement updateEdiciones = conexion.conectar().prepareCall(queryEdiciones);
+                updateEdiciones.setDate(1, revista.getFechaPublicacion());
+                updateEdiciones.setInt(2, revista.getIdRevista());
+                updateEdiciones.setInt(3, revista.getEdicion());
+                updateEdiciones.executeUpdate();
+                
+                conexion.conectar().commit();
+                conexion.conectar().setAutoCommit(true);
+            }catch(SQLException e){
+                conexion.conectar().rollback();
+                System.out.println("erro haciendo rollback");
+            }
+            conexion.desconectar();
+        }catch(SQLException ex){
+        
+        }   
     }
 }

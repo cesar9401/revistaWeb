@@ -8,6 +8,7 @@ package controlador;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -17,10 +18,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import modelo.MetodosDePagoDAO;
-import modelo.RevistaDAO;
-import objeto.MetodosDePago;
-import objeto.Revista;
+import modelo.*;
+import objeto.*;
 
 /**
  *
@@ -30,8 +29,10 @@ import objeto.Revista;
 @MultipartConfig(maxFileSize = 16177215)
 public class ControladorRevista extends HttpServlet {
 
+    UsuarioDAO usuarioDAO = new UsuarioDAO();
     RevistaDAO revistaDAO = new RevistaDAO();
     MetodosDePagoDAO metodosDePagoDAO = new MetodosDePagoDAO();
+    Operaciones operaciones = new Operaciones();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -86,7 +87,7 @@ public class ControladorRevista extends HttpServlet {
             case "buscarRevistas":
                 List<Revista> revistas = revistaDAO.getRevistas();
                 for (int i = 0; i < revistas.size(); i++) {
-                    if(revistas.get(i).isBloquear()){
+                    if (revistas.get(i).isBloquear()) {
                         revistas.remove(i);
                         i = i - 1;
                     }
@@ -95,8 +96,21 @@ public class ControladorRevista extends HttpServlet {
                 request.getRequestDispatcher("buscarRevistas.jsp").forward(request, response);
                 break;
 
-            default:
+            case "buscarEditores":
+                List<Usuario> editores = usuarioDAO.getUsuarios(true);
+                request.getSession().setAttribute("editores", editores);
+                request.getRequestDispatcher("buscarEditores.jsp").forward(request, response);
                 break;
+
+            default:
+                if (!action.equals("")) {
+                    int idRevista = Integer.parseInt(action);
+                    Revista revista = revistaDAO.getRevistaById(idRevista);
+                    request.getSession().setAttribute("revista", revista);
+                    request.getRequestDispatcher("procesarRevista.jsp").forward(request, response);
+                }
+                break;
+
         }
     }
 
@@ -123,16 +137,14 @@ public class ControladorRevista extends HttpServlet {
             case "RegistrarMetodo":
                 RegistarMetodo(request, response);
                 break;
-                
+
             case "ProcesarRevista":
-                
+                ProcesarRevista(request, response);
                 break;
+
             default:
-
                 break;
-
         }
-
     }
 
     public void NuevaRevista(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -198,13 +210,37 @@ public class ControladorRevista extends HttpServlet {
         MetodosDePago tarjeta = new MetodosDePago(numero, nombre, date, codigo, user);
 
         metodosDePagoDAO.setMetodoDePago(tarjeta);
-        request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+        response.sendRedirect("inicioEditor.jsp");
     }
-    
-    public void ProcesarRevista(HttpServletRequest request, HttpServletResponse response){
-        Double cuotaPorDia = Double.parseDouble(request.getParameter("cuota"));
+
+    public void ProcesarRevista(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        Revista revista = (Revista) request.getSession().getAttribute("revista");
+        Double cuotaDia = Double.parseDouble(request.getParameter("cuota"));
         Double porcentaje = Double.parseDouble(request.getParameter("porcentaje"));
-        Revista revista = (Revista) request.getAttribute("revista");
-        
+        String fecha = request.getParameter("fecha");
+        java.sql.Date date = null;
+        try {
+            date = operaciones.getDate(fecha);
+        } catch (ParseException ex) {
+        }
+
+        revista.setBloquear(false);
+        revista.setFechaPublicacion(date);
+        int idUtilidades = revistaDAO.getIdRegistroUtilidades();
+        revistaDAO.setProcesarRevista(revista, porcentaje, cuotaDia, idUtilidades);
+
+        //write your code here
+        request.getSession().removeAttribute("revista");
+        request.getSession().removeAttribute("revistas");
+
+        List<Revista> revistas = revistaDAO.getRevistas();
+        for (int i = 0; i < revistas.size(); i++) {
+            if (!revistas.get(i).isBloquear()) {
+                revistas.remove(i);
+                i = i - 1;
+            }
+        }
+        request.getSession().setAttribute("revistas", revistas);
+        response.sendRedirect("inicioAdministrador.jsp");
     }
 }

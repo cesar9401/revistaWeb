@@ -12,14 +12,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import modelo.RevistaDAO;
-import objeto.Revista;
 
 /**
  *
  * @author cesar31
  */
 public class RevistasController extends HttpServlet {
-    
+
     RevistaDAO revistaDAO = new RevistaDAO();
 
     /**
@@ -39,7 +38,7 @@ public class RevistasController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet RevistasController</title>");            
+            out.println("<title>Servlet RevistasController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet RevistasController at " + request.getContextPath() + "</h1>");
@@ -60,12 +59,17 @@ public class RevistasController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        try {
+            String showPDF = request.getParameter("showPDF");
+            int id = Integer.parseInt(showPDF);
+            
+            //Obtener revista en PDF
+            revistaDAO.getPdf(id, response);
+        } catch (NullPointerException ex) {
+
+        }
         
-        String action = request.getParameter("action");
-        int idRevista = Integer.parseInt(action);
-        Revista revista = revistaDAO.getRevistaById(idRevista);
-        request.getSession().setAttribute("revista", revista);
-        request.getRequestDispatcher("procesarRevista.jsp").forward(request, response);
     }
 
     /**

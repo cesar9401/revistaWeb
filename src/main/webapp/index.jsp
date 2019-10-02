@@ -13,7 +13,6 @@
         <link href="css/estilo.css" rel="stylesheet" type="text/css"/>
         <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
     </head>
-    
     <body>
         <p><%=session.getAttribute("user")%></p>
     <center>
@@ -24,12 +23,11 @@
             <p><a href="iniciarSesion.jsp" title ="IniciarSesion">Iniciar Sesion</a></p>
         </div>
     </center>
-    
-    
-    
+
+
+
     <script src="js/jquery-3.3.1.slim.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    </body>
-    
+</body>
 </html>

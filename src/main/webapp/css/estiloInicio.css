@@ -12,8 +12,8 @@ body{
 
 .acciones{
     position: absolute;
-    top: 350px;
-    left: 20px;
+    top: 20px;
+    right: 20px;
     line-height: 5px;
 }
 

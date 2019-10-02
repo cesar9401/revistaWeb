@@ -22,7 +22,7 @@
 
         <h1 align="center">Procesar Revista: <%=revista.getTituloRevista()%></h1>
         <br/>
-        <form class="formulario" action="#" method="post">
+        <form class="formulario" action="ControladorRevista" method="post">
             <div class="form-group row">
                 <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg">idRevista</label>
                 <div class="col-sm-10">
@@ -92,13 +92,13 @@
             <div class="form-group row">
                 <label for="fecha" class="col-sm-2 col-form-label col-form-label-lg">Fecha de Publicacion</label>
                 <div class="col-sm-10">
-                    <input class="form-control form-control-lg" id="colFormLabelLg" name="fecha"/>
+                    <input class="form-control form-control-lg" type="date" id="colFormLabelLg" name="fecha"/>
                 </div>
             </div>
 
             <hr/>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-2">Procesar</button>
+                <button type="submit" class="btn btn-primary mb-2" name="accion" value="ProcesarRevista">Procesar</button>
             </div>
             <hr/>
         </form>

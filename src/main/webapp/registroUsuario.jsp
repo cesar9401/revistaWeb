@@ -41,38 +41,8 @@
                 <option>Editor</option>
             </select><br/><br/>
 
-            <label for="fecha">Fecha de Nacimiento</label><br/><br/>
-            <label for="mes">Mes</label>
-            <select name="mes">
-                <%for (int i = 0; i < 12; i++) {
-                %>
-                <option>  <%=i + 1%> </option>
-                <%
-                    }
-                %>
-            </select>
-
-            <label for="dia">Dia</label>
-            <select name="dia">
-                <%for (int i = 1; i <= 31; i++) {
-                %>
-                <option><%=i%></option>
-                <%
-                    }
-                %>
-            </select>
-
-            <label for="year">Año</label>
-            <select name="year">
-                <%  Calendar hoy = Calendar.getInstance();
-                    int year = hoy.get(Calendar.YEAR);
-                    for (int i = year - 80; i <= year - 18; i++) {
-                %>
-                <option value="<%=i%>"><%=i%></option>
-                <%
-                    }
-                %>
-            </select><br/><br/>
+            <label for="fecha">Fecha de Nacimiento</label><br/>
+            <input type="date" id="fecha" name="fecha"/><br/><br/>
 
             <label for="nacionalidad">Nacionalidad</label><br/>
             <input id="nacionalidad" name="nacionalidad"/><br/><br/>

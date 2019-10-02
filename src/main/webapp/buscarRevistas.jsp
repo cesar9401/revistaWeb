@@ -9,7 +9,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%
-    List<Revista> revistas = (List<Revista>) session.getAttribute("revistasUser");
+    List<Revista> revistasUser = (List<Revista>) session.getAttribute("revistasUser");
 %>
 <!DOCTYPE html>
 <html>
@@ -17,17 +17,22 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Buscar Revistas - <%=session.getAttribute("user")%></title>
         <link href="css/estilo.css" rel="stylesheet" type="text/css"/>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
-        
+
         <%
-            for (int i = 0; i < revistas.size(); i++) {
-                    %>
-                    <p><%=revistas.get(i).getTituloRevista() %></p>
-                    <p><%=revistas.get(i).isBloquear() %></p>
-                    <%
-                }
+            for (int i = 0; i < revistasUser.size(); i++) {
         %>
-        
+        <p><%=revistasUser.get(i).getTituloRevista()%></p>
+        <%
+            }
+        %>
+
+
+
+        <script src="js/jquery-3.3.1.slim.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
     </body>
 </html>

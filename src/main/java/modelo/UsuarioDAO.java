@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import objeto.Usuario;
 
@@ -76,7 +78,7 @@ public class UsuarioDAO {
             String query = "SELECT * FROM administrador WHERE usuarioAdmin = ? AND password = ?";
             PreparedStatement getAdmin = conexion.conectar().prepareStatement(query);
             getAdmin.setString(1, idUsuario);
-            getAdmin.setString(2,password);
+            getAdmin.setString(2, password);
             ResultSet r = getAdmin.executeQuery();
             if (r.next()) {
                 admin = new Usuario(r.getString("usuarioAdmin"), r.getString("email"), r.getString("password"));
@@ -120,7 +122,7 @@ public class UsuarioDAO {
         y un objeto de tipo response para poder imprimir sobre la pagina jsp/html.
      */
     public void getImg(String idUsuario, HttpServletResponse response) {
-        String query = "SELECT * FROM usuario WHERE idUsuario = ?";
+        String query = "SELECT foto FROM usuario WHERE idUsuario = ?";
         response.setContentType("image/*");
         OutputStream outputStream = null;
         InputStream inputStream = null;
@@ -148,5 +150,53 @@ public class UsuarioDAO {
         } catch (Exception ex) {
 
         }
+    }
+
+    /*
+        Metodo que devuelve un listado con objetos de tipo usuario con la informacion de los usuarios, 
+        editores o no.
+     */
+    public List<Usuario> getUsuarios(boolean editor) {
+        List<Usuario> usuarios = new ArrayList<>();
+        try {
+            String query = "SELECT * FROM usuario WHERE editor = ?";
+            PreparedStatement getUsuarios = conexion.conectar().prepareStatement(query);
+            getUsuarios.setBoolean(1, editor);
+            ResultSet r = getUsuarios.executeQuery();
+            while (r.next()) {
+                Usuario tmp = new Usuario(r.getString("idUsuario"), r.getString("email"), r.getString("ubicacion"), r.getDate("fechaNac"), r.getString("sexo"), r.getString("password"), r.getString("hobbies"), r.getString("descripcion"), r.getBoolean("editor"));
+                tmp.setFoto(r.getBytes("foto"));
+                tmp.setNombres(r.getString("nombres"));
+                tmp.setApellidos(r.getString("apellidos"));
+                usuarios.add(tmp);
+            }
+        } catch (SQLException ex) {
+
+        }
+
+        return usuarios;
+    }
+
+    /*
+        Metodo que devuelve un objeto del tipo Usuario, recibe como parametro un String con el idUsuario
+    */
+    public Usuario getUsuario(String idUsuario) {
+        Usuario tmp = null;
+        try {
+            String query = "SELECT * FROM usuario WHERE idUsuario = ?";
+            PreparedStatement getUsuario = conexion.conectar().prepareStatement(query);
+            getUsuario.setString(1, idUsuario);
+            ResultSet r = getUsuario.executeQuery();
+            if (r.next()) {
+                tmp = new Usuario(r.getString("idUsuario"), r.getString("email"), r.getString("ubicacion"), r.getDate("fechaNac"), r.getString("sexo"), r.getString("password"), r.getString("hobbies"), r.getString("descripcion"), r.getBoolean("editor"));
+                tmp.setFoto(r.getBytes("foto"));
+                tmp.setNombres(r.getString("nombres"));
+                tmp.setApellidos(r.getString("apellidos"));
+            }
+        } catch (SQLException ex) {
+
+        }
+        
+        return tmp;
     }
 }

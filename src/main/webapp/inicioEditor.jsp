@@ -12,7 +12,6 @@
 
 <%
     //Obtener al usuario del servlet
-    //Usuario tmp = (Usuario) request.getAttribute("usuario");
     Usuario tmp = (Usuario) session.getAttribute("usuario");
     List<Revista> revistas = (List<Revista>) session.getAttribute("revistas");
     session.setAttribute("user", tmp.getIdUsuario());
@@ -41,13 +40,11 @@
         <div class="user">
             <div>
                 <h1><%=tmp.getIdUsuario()%></h1>
+                <p>Nombre: <%=tmp.getNombres() + " " + tmp.getApellidos()%></p>
                 <p>Contacto: <%=tmp.getEmail()%></p>
                 <p>Nacimiento: <%=tmp.getFechaNac()%></p>
                 <p>Nacionalidad: <%=tmp.getUbicacion()%></p>
                 <p>Sexo: <%=tmp.getSexo()%></p>
-            </div>
-            <div class="foto2">
-                <img src="img/editor.png" alter="editor" title="editor" height="160px"/>
             </div>
         </div>
 
@@ -62,32 +59,50 @@
         </div>
 
         <div class="ListRevistas">
-            <h2>Mis Revistas </h2>
-
-            <table border="1px">
-                <tr>
-                    <th>Titulo</th>
-                    <th>Categoria</th>
-                    <th>Descripcion</th>
-                    <th>Edicion</th>
-                    <th>Cuota Suscripcion</th>
-                </tr>
-                <%
-                    for (int i = 0; i < revistas.size(); i++) {
-                %>
-                <tr>
-                    <td><%=revistas.get(i).getTituloRevista()%></td>
-                    <td><%=revistas.get(i).getCategoria()%> </td>
-                    <td><%=revistas.get(i).getDescripcion()%></td>
-                    <td><%=revistas.get(i).getEdicion()%></td>
-                    <td><%=revistas.get(i).getCuotaSuscripcion()%></td>
-                </tr>
-                <%
-                    }
-                %>
-
-
-
+            <h2 align="center">Mis Revistas</h2><hr/>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Titulo</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Edicion</th>
+                        <th scope="col">Cuota Suscripcion</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Suscriptores</th>
+                        <th scope="col">ArchivoPDF</th>
+                        <th scope="col" rowspan="3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        for (int i = 0; i < revistas.size(); i++) {
+                    %>
+                    <tr>
+                        <th scope="row"><%=i + 1%></th>
+                        <td><%=revistas.get(i).getTituloRevista()%></td>
+                        <td><%=revistas.get(i).getCategoria()%></td>
+                        <td><%=revistas.get(i).getEdicion()%></td>
+                        <td><%=revistas.get(i).getCuotaSuscripcion()%></td>
+                        <%if (revistas.get(i).isBloquear()) {
+                        %>
+                        <td>Bloqueado</td>
+                        <%} else {
+                        %>
+                        <td>Activo</td>
+                        <%
+                            }
+                        %>
+                        <td><%=revistas.get(i).getSuscripciones()%></td>
+                        <td><a href="RevistasController?showPDF=<%=revistas.get(i).getIdRevista()%>" target="blank"><img src="img/mpdf.png" title="<%=revistas.get(i).getTituloRevista()%>" alt="<%=revistas.get(i).getTituloRevista()%>"/></a></td>
+                        <td><img src="img/nuevo.png"/></td>
+                        <td><img src="img/editar.png"/></td>
+                        <td><img src="img/delete.png"/></td>
+                    </tr>
+                    <%
+                        }
+                    %>
+                </tbody>
             </table>
         </div>
 

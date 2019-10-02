@@ -7,8 +7,10 @@ package controlador;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
+import java.text.ParseException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import modelo.Operaciones;
 import modelo.RevistaDAO;
 import modelo.UsuarioDAO;
 import objeto.Revista;
@@ -30,8 +33,9 @@ import objeto.Usuario;
 @MultipartConfig(maxFileSize = 16177215)
 public class ControladorUsuario extends HttpServlet {
 
-    UsuarioDAO usr = new UsuarioDAO();
+    UsuarioDAO usuarioDAO = new UsuarioDAO();
     RevistaDAO revista = new RevistaDAO();
+    Operaciones operaciones = new Operaciones();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -63,7 +67,7 @@ public class ControladorUsuario extends HttpServlet {
 
         try {
             String idUsuario = request.getParameter("idUsuario");
-            usr.getImg(idUsuario, response);
+            usuarioDAO.getImg(idUsuario, response);
         } catch (IllegalStateException ex) {
 
         }
@@ -78,6 +82,7 @@ public class ControladorUsuario extends HttpServlet {
                     break;
 
                 default:
+                    mostrarPerfilEditor(action, request, response);
                     break;
             }
 
@@ -125,7 +130,7 @@ public class ControladorUsuario extends HttpServlet {
 
         //Se envian los datos idUsuario y password a usuarioDAO para verificar si se encuentra registrado en la base
         //de datos
-        Usuario tmp = usr.getUsuario(user, password);
+        Usuario tmp = usuarioDAO.getUsuario(user, password);
         if (tmp != null) {
             //Agregar al usuario tmp al request
             if (tmp.isEditor()) {
@@ -143,7 +148,7 @@ public class ControladorUsuario extends HttpServlet {
 
         } else {
             //Si tmp == null, los datos pueden corresponder a un administrador
-            Usuario admin = usr.getAdministrador(user, password);
+            Usuario admin = usuarioDAO.getAdministrador(user, password);
 
             if (admin != null) {
                 request.getSession().setAttribute("admin", admin);
@@ -169,21 +174,14 @@ public class ControladorUsuario extends HttpServlet {
         String nombres = request.getParameter("nombre");
         String apellidos = request.getParameter("apellido");
         boolean editor = true ? (request.getParameter("tipoCuenta").equals("Editor")) : false;
-
-        int month = 0;
-        int day = 0;
-        int year = 0;
-
+        String fecha = request.getParameter("fecha");
+        java.sql.Date date = null;
         try {
-            month = Integer.parseInt(request.getParameter("mes")) - 1;
-            day = Integer.parseInt(request.getParameter("dia"));
-            year = Integer.parseInt(request.getParameter("year"));
-        } catch (NumberFormatException ex) {
-
+            date = operaciones.getDate(fecha);
+        } catch (ParseException ex) {
+            Logger.getLogger(ControladorUsuario.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Calendar fecha = Calendar.getInstance();
-        fecha.set(year, month, day);
-        java.sql.Date fechaNac = new java.sql.Date(fecha.getTimeInMillis());
+
         String nacionalidad = request.getParameter("nacionalidad");
         String sexo = request.getParameter("sexo");
         String descripcion = request.getParameter("descripcion");
@@ -191,7 +189,7 @@ public class ControladorUsuario extends HttpServlet {
         //String urlFoto = request.getParameter("fotografia");
 
         String pass = request.getParameter("pass");
-        Usuario tmp = new Usuario(usuario, email, nacionalidad, fechaNac, sexo, pass, hobbies, descripcion, false);
+        Usuario tmp = new Usuario(usuario, email, nacionalidad, date, sexo, pass, hobbies, descripcion, false);
         tmp.setNombres(nombres);
         tmp.setApellidos(apellidos);
 
@@ -224,7 +222,14 @@ public class ControladorUsuario extends HttpServlet {
         }
 
         //Guardar al usuario tmp en la base de datos
-        usr.setUsuario(tmp);
+        usuarioDAO.setUsuario(tmp);
+    }
+
+    public void mostrarPerfilEditor(String idEditor, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Usuario tmp = usuarioDAO.getUsuario(idEditor);
+        request.getSession().setAttribute("editor", tmp);
+        response.sendRedirect("perfilEditor.jsp");
+        //request.getRequestDispatcher("perfilEditor.jsp").forward(request, response);
     }
 
     /**
