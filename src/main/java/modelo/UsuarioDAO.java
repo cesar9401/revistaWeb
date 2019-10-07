@@ -3,6 +3,7 @@ package modelo;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
@@ -137,7 +138,7 @@ public class UsuarioDAO {
 
             try {
                 outputStream = response.getOutputStream();
-            } catch (Exception e) {
+            } catch (IOException e) {
 
             }
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);

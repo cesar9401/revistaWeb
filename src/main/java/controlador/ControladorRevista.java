@@ -74,6 +74,7 @@ public class ControladorRevista extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("accion");
+        Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
         String user = (String) request.getSession().getAttribute("user");
         switch (action) {
             case "newRevista":
@@ -85,7 +86,7 @@ public class ControladorRevista extends HttpServlet {
                 break;
 
             case "buscarRevistas":
-                List<Revista> revistas = revistaDAO.getRevistas();
+                List<Revista> revistas = revistaDAO.getRevistasForUser(user, false);
                 for (int i = 0; i < revistas.size(); i++) {
                     if (revistas.get(i).isBloquear()) {
                         revistas.remove(i);
@@ -100,6 +101,14 @@ public class ControladorRevista extends HttpServlet {
                 List<Usuario> editores = usuarioDAO.getUsuarios(true);
                 request.getSession().setAttribute("editores", editores);
                 request.getRequestDispatcher("buscarEditores.jsp").forward(request, response);
+                break;
+
+            case "inicio":
+                if (usuario.isEditor()) {
+                    request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
+                } else {
+                    request.getRequestDispatcher("inicio.jsp").forward(request, response);
+                }
                 break;
 
             default:
@@ -140,6 +149,19 @@ public class ControladorRevista extends HttpServlet {
 
             case "ProcesarRevista":
                 ProcesarRevista(request, response);
+                break;
+
+            case "Suscribirme":
+                if (metodosDePagoDAO.verificarMetodo(user)) {
+                    setSuscripcion(request, response);
+                } else {
+                    response.sendRedirect("metodoDePago.jsp");
+                }
+                break;
+
+            case "Comentario":
+                //Comentario aqui
+                setComentario(request, response);
                 break;
 
             default:
@@ -205,12 +227,15 @@ public class ControladorRevista extends HttpServlet {
         fecha.set(year, month - 1, day);
         java.sql.Date date = new java.sql.Date(fecha.getTimeInMillis());
         String codigo = request.getParameter("codigo");
-        String user = (String) request.getSession().getAttribute("user");
-
-        MetodosDePago tarjeta = new MetodosDePago(numero, nombre, date, codigo, user);
-
+        Usuario usuario = (Usuario) request.getSession().getAttribute("usuario");
+        MetodosDePago tarjeta = new MetodosDePago(numero, nombre, date, codigo, usuario.getIdUsuario());
         metodosDePagoDAO.setMetodoDePago(tarjeta);
-        response.sendRedirect("inicioEditor.jsp");
+
+        if (usuario.isEditor()) {
+            response.sendRedirect("inicioEditor.jsp");
+        } else {
+            response.sendRedirect("inicio.jsp");
+        }
     }
 
     public void ProcesarRevista(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -242,5 +267,48 @@ public class ControladorRevista extends HttpServlet {
         }
         request.getSession().setAttribute("revistas", revistas);
         response.sendRedirect("inicioAdministrador.jsp");
+    }
+
+    public void setSuscripcion(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        String user = (String) request.getSession().getAttribute("user");
+        int idRevista = Integer.parseInt(request.getParameter("idMagazine"));
+        double cuotaSuscripcion = Double.parseDouble(request.getParameter("cuota"));
+        String fecha = request.getParameter("fecha");
+        java.sql.Date date = null;
+        try {
+            date = operaciones.getDate(fecha);
+        } catch (ParseException ex) {
+
+        }
+
+        int idSuscripcion = operaciones.getIdSuscripcion();
+        double porcentaje = revistaDAO.getPorcentaje(idRevista);
+        operaciones.setSuscripcion(idSuscripcion, cuotaSuscripcion, porcentaje, user, idRevista, date);
+        List<Revista> misRevistas = revistaDAO.getRevistasForUser(user, true);
+        request.getSession().setAttribute("misRevistas", misRevistas);
+
+        response.sendRedirect("inicio.jsp");
+        //request.getRequestDispatcher("inicio.jsp").forward(request, response);
+    }
+
+    private void setComentario(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        Revista revista = (Revista) request.getSession().getAttribute("revista");
+        String usuario = (String) request.getSession().getAttribute("user");
+        String comment = request.getParameter("comentario");
+        String fecha = request.getParameter("fecha");
+        java.sql.Date date = null;
+        try {
+            date = operaciones.getDate(fecha);
+        } catch (ParseException ex) {
+
+        }
+        int idSuscripcion = operaciones.getIdSuscripcionForUser(revista.getIdRevista(), usuario);
+        Comentario comentario = new Comentario(idSuscripcion, comment, revista.getIdRevista(), usuario, date);
+        System.out.println(comentario.toString());
+        revistaDAO.setComentario(comentario);
+        List<Comentario> comentarios = revistaDAO.getComentarios(revista.getIdRevista());
+        request.getSession().setAttribute("comentarios", comentarios);
+        response.sendRedirect("visualizarRevista.jsp");
     }
 }

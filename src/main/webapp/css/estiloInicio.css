@@ -10,9 +10,14 @@ body{
     left: 20px;
 }
 
+.action{
+    position: absolute;
+    right: 10px;
+}
+
 .acciones{
     position: absolute;
-    top: 20px;
+    top: 70px;
     right: 20px;
     line-height: 5px;
 }
@@ -51,6 +56,10 @@ body{
     background-color: #A9E1F2;  
 }
 
+.misRevistas{
+    position: absolute;
+    top: 400px;
+}
 
 
 p{

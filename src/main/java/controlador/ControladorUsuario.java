@@ -19,11 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-import modelo.Operaciones;
-import modelo.RevistaDAO;
-import modelo.UsuarioDAO;
-import objeto.Revista;
-import objeto.Usuario;
+import modelo.*;
+import objeto.*;
 
 /**
  *
@@ -34,6 +31,8 @@ import objeto.Usuario;
 public class ControladorUsuario extends HttpServlet {
 
     UsuarioDAO usuarioDAO = new UsuarioDAO();
+    RevistaDAO revistaDAO = new RevistaDAO();
+    MetodosDePagoDAO metodosDePagoDAO = new MetodosDePagoDAO();
     RevistaDAO revista = new RevistaDAO();
     Operaciones operaciones = new Operaciones();
 
@@ -65,6 +64,7 @@ public class ControladorUsuario extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        //Para mostrar la imagen de perfil del usuario, o los editores
         try {
             String idUsuario = request.getParameter("idUsuario");
             usuarioDAO.getImg(idUsuario, response);
@@ -72,8 +72,10 @@ public class ControladorUsuario extends HttpServlet {
 
         }
 
+        //Para cerrar sesion de usuarios y editores, y mostrar perfil de los editores
         try {
             String action = request.getParameter("action");
+            String user = (String) request.getSession().getAttribute("user");
             switch (action) {
                 case "CerrarSesion":
                     HttpSession session = request.getSession();
@@ -89,7 +91,6 @@ public class ControladorUsuario extends HttpServlet {
         } catch (NullPointerException ex) {
 
         }
-
     }
 
     /**
@@ -136,13 +137,17 @@ public class ControladorUsuario extends HttpServlet {
             if (tmp.isEditor()) {
                 //request.setAttribute("usuario", tmp);
                 List<Revista> revistas = revista.getRevistasByEditor(user);
+                List<Revista> reporteRevistas = operaciones.getRevistaForReportes(user);
                 request.getSession().setAttribute("usuario", tmp);
                 request.getSession().setAttribute("revistas", revistas);
+                request.getSession().setAttribute("reporteRevistas", reporteRevistas);
                 request.getRequestDispatcher("inicioEditor.jsp").forward(request, response);
 
             } else {
                 //request.setAttribute("usuario", tmp);
                 request.getSession().setAttribute("usuario", tmp);
+                List<Revista> misRevistas = revistaDAO.getRevistasForUser(user, true);
+                request.getSession().setAttribute("misRevistas", misRevistas);
                 request.getRequestDispatcher("inicio.jsp").forward(request, response);
             }
 
@@ -218,7 +223,10 @@ public class ControladorUsuario extends HttpServlet {
 
         } else {
             request.getSession().setAttribute("usuario", tmp);
+            List<Revista> misRevistas = revistaDAO.getRevistasForUser(usuario, true);
+            request.getSession().setAttribute("misRevistas", misRevistas);
             request.getRequestDispatcher("inicio.jsp").forward(request, response);
+
         }
 
         //Guardar al usuario tmp en la base de datos
@@ -227,6 +235,8 @@ public class ControladorUsuario extends HttpServlet {
 
     public void mostrarPerfilEditor(String idEditor, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Usuario tmp = usuarioDAO.getUsuario(idEditor);
+        List<Revista> revistasEditor = revistaDAO.getRevistasByEditor(idEditor);
+        request.getSession().setAttribute("revistasEditor", revistasEditor);
         request.getSession().setAttribute("editor", tmp);
         response.sendRedirect("perfilEditor.jsp");
         //request.getRequestDispatcher("perfilEditor.jsp").forward(request, response);

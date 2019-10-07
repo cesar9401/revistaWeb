@@ -7,11 +7,13 @@ package controlador;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import modelo.RevistaDAO;
+import modelo.*;
+import objeto.*;
 
 /**
  *
@@ -20,6 +22,8 @@ import modelo.RevistaDAO;
 public class RevistasController extends HttpServlet {
 
     RevistaDAO revistaDAO = new RevistaDAO();
+    MetodosDePagoDAO metodosDePagoDAO = new MetodosDePagoDAO();
+    Operaciones operaciones = new Operaciones();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -60,16 +64,32 @@ public class RevistasController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        //Mostrar pdf, recibe el id de la revista y devuelve el pdf
         try {
             String showPDF = request.getParameter("showPDF");
             int id = Integer.parseInt(showPDF);
-            
+
             //Obtener revista en PDF
             revistaDAO.getPdf(id, response);
-        } catch (NullPointerException ex) {
+        } catch (NumberFormatException ex) {
 
         }
-        
+
+        //Para redirigir hacia la pagina visualizarRevista, con la informacion de la revista
+        try {
+            String action = request.getParameter("action");
+            int idRevista = Integer.parseInt(action);
+            Revista revista = revistaDAO.getRevistaById(idRevista);
+            request.getSession().setAttribute("revista", revista);
+
+            //Insertar listado de comentarios aquí
+            List<Comentario> comentarios = revistaDAO.getComentarios(idRevista);
+            request.getSession().setAttribute("comentarios", comentarios);
+            response.sendRedirect("visualizarRevista.jsp");
+            //request.getRequestDispatcher("visualizarRevista.jsp").forward(request, response);
+        } catch (NumberFormatException ex) {
+
+        }
     }
 
     /**

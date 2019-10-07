@@ -3,7 +3,11 @@ body{
     background-attachment: fixed;
 }
 
-label{
+.coments{
+    width: 45%;
+    position: absolute;
+    right: 10%;
+    top:50px;
     background-color: white;
 }
 

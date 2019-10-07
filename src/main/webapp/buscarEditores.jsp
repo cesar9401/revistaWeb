@@ -20,6 +20,29 @@
 
     </head>
     <body>
+
+        <div class="action">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="inicio.jsp"><%=session.getAttribute("user")%></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="ControladorRevista?accion=buscarEditores">Editores</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="ControladorRevista?accion=buscarRevistas">Revistas</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Acciones</a>
+                    <div class="dropdown-menu">
+                        <!--Insertar enlaces aqui-->
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="ControladorUsuario?action=CerrarSesion">Cerrar Sesion</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
         <br/>
         <h1 align="center">Editores</h1>
         <hr/>

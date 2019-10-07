@@ -2,13 +2,14 @@
 package objeto;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.Date;
 
 /**
  *
  * @author cesar31
  */
-public class Revista{
+public class Revista implements Serializable{
     
     private int idRevista;
     private String tituloRevista;
@@ -24,7 +25,27 @@ public class Revista{
     private int suscripciones;
     private boolean bloquear;
     private String idUsuario;
-
+    
+    //Datos para sucripciones
+    private int idSuscripcion;
+    private String idSuscriptor;
+    private Date fechaSuscripcion;
+    
+    //Constructor para Reporte de suscripciones
+    public Revista(int idRevista, String tituloRevista, String categoria, int edicion, double cuotaSuscripcion, Date fechaPublicacion, int suscripciones, int idSuscripcion, String idSuscriptor, Date fechaSuscripcion) {
+        this.idRevista = idRevista;
+        this.tituloRevista = tituloRevista;
+        this.categoria = categoria;
+        this.edicion = edicion;
+        this.cuotaSuscripcion = cuotaSuscripcion;
+        this.fechaPublicacion = fechaPublicacion;
+        this.suscripciones = suscripciones;
+        this.idSuscripcion = idSuscripcion;
+        this.idSuscriptor = idSuscriptor;
+        this.fechaSuscripcion = fechaSuscripcion;
+    }
+    
+    //Constructor para revista
     public Revista(String tituloRevista, String categoria, String descripcion, double cuotaSuscripcion, boolean reaccion, boolean comentarios, String idUsuario) {
         this.tituloRevista = tituloRevista;
         this.categoria = categoria;
@@ -145,5 +166,29 @@ public class Revista{
 
     public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public int getIdSuscripcion() {
+        return idSuscripcion;
+    }
+
+    public void setIdSuscripcion(int idSuscripcion) {
+        this.idSuscripcion = idSuscripcion;
+    }
+
+    public String getIdSuscriptor() {
+        return idSuscriptor;
+    }
+
+    public void setIdSuscriptor(String idSuscriptor) {
+        this.idSuscriptor = idSuscriptor;
+    }
+
+    public Date getFechaSuscripcion() {
+        return fechaSuscripcion;
+    }
+
+    public void setFechaSuscripcion(Date fechaSuscripcion) {
+        this.fechaSuscripcion = fechaSuscripcion;
     }
 }

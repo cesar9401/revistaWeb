@@ -3,6 +3,7 @@ package modelo;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
-import objeto.Revista;
+import objeto.*;
 
 /**
  *
@@ -40,25 +41,25 @@ public class RevistaDAO {
         }
         return id;
     }
-    
-    public int getIdRegistroUtilidades(){
+
+    public int getIdRegistroUtilidades() {
         int idUtilidades = 1;
-        try{
+        try {
             conexion.conectar();
             String query = "SELECT idRegistroUtilidades FROM registroUtilidades";
             Statement registroUtilidades = conexion.conectar().createStatement();
             ResultSet r = registroUtilidades.executeQuery(query);
-            while(r.next()){
-                if(idUtilidades <= r.getInt("idRegistroUtilidades")){
+            while (r.next()) {
+                if (idUtilidades <= r.getInt("idRegistroUtilidades")) {
                     idUtilidades = r.getInt("idRegistroUtilidades") + 1;
                 }
             }
-            
+
             conexion.desconectar();
-        }catch(SQLException ex){
-        
+        } catch (SQLException ex) {
+
         }
-            
+
         return idUtilidades;
     }
 
@@ -180,7 +181,7 @@ public class RevistaDAO {
 
     /*
         Metodo para obtener un listado con todas las revistas en la base de datos
-    */
+     */
     public List<Revista> getRevistas() {
         List<Revista> revistas = new ArrayList<>();
         Revista tmp;
@@ -223,7 +224,7 @@ public class RevistaDAO {
 
     /*
         Metodo para obtener una revista segun el idRevista, devuelve un objeto del tipo Revista
-    */
+     */
     public Revista getRevistaById(int idRevista) {
         Revista tmp = null;
         try {
@@ -270,8 +271,8 @@ public class RevistaDAO {
         try {
             conexion.conectar();
             String query = "SELECT idEdicion FROM edicionesRevistas";
-            PreparedStatement getEdicion = conexion.conectar().prepareStatement(query);
-            ResultSet r = getEdicion.executeQuery();
+            Statement getEdicion = conexion.conectar().createStatement();
+            ResultSet r = getEdicion.executeQuery(query);
             while (r.next()) {
                 if (idEdicion <= r.getInt("idEdicion")) {
                     idEdicion = r.getInt("idEdicion") + 1;
@@ -287,7 +288,7 @@ public class RevistaDAO {
 
     /*
         Metodo para regresar el archivo pdf que solicite el usuario y poder leerlo en pantalla
-    */
+     */
     public void getPdf(int idRevista, HttpServletResponse response) throws IOException {
         response.setContentType("application/pdf");
         InputStream inputStream = null;
@@ -304,7 +305,7 @@ public class RevistaDAO {
             int tamañoInput = inputStream.available();
             byte[] datosPDF = new byte[tamañoInput];
             inputStream.read(datosPDF, 0, tamañoInput);
-            
+
             response.getOutputStream().write(datosPDF);
             inputStream.close();
             getPdf.close();
@@ -314,15 +315,15 @@ public class RevistaDAO {
 
         }
     }
-    
+
     /*
         Metodo para procesar revistas, el administrador establece el porcentaje que le corresponde al editor
         y al dueño de la pagina asi como tambien la cuota para mantenimiento de la pagina
-    */
-    public void setProcesarRevista(Revista revista, Double porcentaje, Double cuotaDia, int idUtilidades){
-        try{
+     */
+    public void setProcesarRevista(Revista revista, Double porcentaje, Double cuotaDia, int idUtilidades) {
+        try {
             conexion.conectar();
-            try{
+            try {
                 conexion.conectar().setAutoCommit(false);
                 String queryRevista = "UPDATE revista SET fechaPubl = ?, bloquear = ? WHERE idRevista = ?";
                 PreparedStatement updateRevista = conexion.conectar().prepareStatement(queryRevista);
@@ -330,7 +331,7 @@ public class RevistaDAO {
                 updateRevista.setBoolean(2, revista.isBloquear());
                 updateRevista.setInt(3, revista.getIdRevista());
                 updateRevista.executeUpdate();
-                
+
                 String queryUtilidades = "INSERT INTO registroUtilidades(idRegistroUtilidades, revista_idRevista, porcentaje, costoDia) VALUES(?, ?, ?, ?)";
                 PreparedStatement setRegistro = conexion.conectar().prepareStatement(queryUtilidades);
                 setRegistro.setInt(1, idUtilidades);
@@ -338,23 +339,156 @@ public class RevistaDAO {
                 setRegistro.setDouble(3, porcentaje);
                 setRegistro.setDouble(4, cuotaDia);
                 setRegistro.executeUpdate();
-                
+
                 String queryEdiciones = "UPDATE edicionesRevistas SET fechaPublicacion = ? WHERE revista_idRevista = ? AND edicionRevista = ?";
                 PreparedStatement updateEdiciones = conexion.conectar().prepareCall(queryEdiciones);
                 updateEdiciones.setDate(1, revista.getFechaPublicacion());
                 updateEdiciones.setInt(2, revista.getIdRevista());
                 updateEdiciones.setInt(3, revista.getEdicion());
                 updateEdiciones.executeUpdate();
-                
+
                 conexion.conectar().commit();
                 conexion.conectar().setAutoCommit(true);
-            }catch(SQLException e){
+            } catch (SQLException e) {
                 conexion.conectar().rollback();
-                System.out.println("erro haciendo rollback");
+                System.out.println("error haciendo rollback");
             }
             conexion.desconectar();
-        }catch(SQLException ex){
-        
-        }   
+        } catch (SQLException ex) {
+
+        }
+    }
+
+    /*
+        Obtener el porcentaje que le corresponde al dueño de la paginaWeb
+     */
+    public double getPorcentaje(int idRevista) {
+        double porcentaje = 0;
+        try {
+            conexion.conectar();
+            String query = "SELECT porcentaje from registroUtilidades WHERE revista_idRevista = ?";
+            PreparedStatement getPorcentaje = conexion.conectar().prepareStatement(query);
+            getPorcentaje.setInt(1, idRevista);
+            ResultSet r = getPorcentaje.executeQuery();
+            if (r.next()) {
+                porcentaje = r.getDouble("porcentaje");
+            }
+            conexion.desconectar();
+        } catch (SQLException ex) {
+
+        }
+
+        return porcentaje;
+    }
+
+    public List<Integer> getIdRevistas(String idUsuario) {
+        List<Integer> idSuscripciones = new ArrayList<>();
+        try {
+            conexion.conectar();
+            String query = "SELECT revista_idRevista FROM suscripcion WHERE usuario_idSuscriptor = ?";
+            PreparedStatement getId = conexion.conectar().prepareStatement(query);
+            getId.setString(1, idUsuario);
+            ResultSet r = getId.executeQuery();
+            while (r.next()) {
+                int id = r.getInt("revista_idRevista");
+                idSuscripciones.add(id);
+            }
+
+            conexion.desconectar();
+        } catch (SQLException e) {
+
+        }
+
+        return idSuscripciones;
+    }
+
+    /*
+        Metodo para obtener las revistas a las que este o no suscrito el usuario, recibe dos parametros
+        el idUsuario y el booleano suscrito para determinar si desea las revistas a las que esta sucrito o no.
+     */
+    public List<Revista> getRevistasForUser(String idUsuario, boolean suscrito) {
+        List<Revista> revistas = new ArrayList<>();
+
+        List<Integer> suscripciones = getIdRevistas(idUsuario);
+        List<Revista> totalRevistas = getRevistas();
+        if (!suscripciones.isEmpty()) {
+            for (int i = 0; i < totalRevistas.size(); i++) {
+                int contador = 0;
+                for (int j = 0; j < suscripciones.size(); j++) {
+
+                    //Revistas donde idUsuario no este suscrito
+                    if (!suscrito) {
+                        if (totalRevistas.get(i).getIdRevista() != suscripciones.get(j)) {
+                            contador++;
+                        }
+                        if (contador == suscripciones.size()) {
+                            revistas.add(totalRevistas.get(i));
+                        }
+                    }
+
+                    //Revistas donde idUsuario esta suscrito
+                    if (totalRevistas.get(i).getIdRevista() == suscripciones.get(j) && suscrito) {
+                        revistas.add(totalRevistas.get(i));
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (suscripciones.isEmpty() && !suscrito) {
+            revistas.addAll(totalRevistas);
+        }
+
+        return revistas;
+    }
+
+    public void setComentario(Comentario comentario) {
+        try {
+            conexion.conectar();
+            String query = "INSERT INTO comentario(suscripcion_idSuscripcion, idRevista, idUsuario, comentario, fechaComentario) VALUES(?, ?, ?, ?, ?)";
+            PreparedStatement setComentarios = conexion.conectar().prepareStatement(query);
+            setComentarios.setInt(1, comentario.getIdSuscripcion());
+            setComentarios.setInt(2, comentario.getIdRevista());
+            setComentarios.setString(3, comentario.getIdUsuario());
+            setComentarios.setString(4, comentario.getComentario());
+            setComentarios.setDate(5, comentario.getDate());
+            setComentarios.executeUpdate();
+            
+            conexion.desconectar();
+        } catch (SQLException ex) {
+
+        }
+
+    }
+
+    public List<Comentario> getComentarios(int idMagazine) {
+        List<Comentario> comentarios = new ArrayList<>();
+        Comentario tmp = null;
+        try {
+            conexion.conectar();
+            String query = "SELECT * FROM comentario WHERE idRevista = ?";
+            PreparedStatement getComentarios = conexion.conectar().prepareStatement(query);
+            getComentarios.setInt(1, idMagazine);
+            ResultSet r = getComentarios.executeQuery();
+            while(r.next()){
+                int idComentario = r.getInt("idComentario");
+                int idSuscripcion = r.getInt("suscripcion_idSuscripcion");
+                int idRevista = r.getInt("idRevista");
+                String idUsuario = r.getString("idUsuario");
+                String comentario = r.getString("comentario");
+                Date date = r.getDate("fechaComentario");
+                
+                tmp = new Comentario(idSuscripcion, comentario, idRevista, idUsuario, date);
+                tmp.setIdComentario(idComentario);
+                
+                comentarios.add(tmp);
+            }
+
+            conexion.desconectar();
+        } catch (SQLException ex) {
+
+        }
+
+        return comentarios;
     }
 }

@@ -10,11 +10,9 @@ body{
     left: 20px;
 }
 
-.acciones{
+.action{
     position: absolute;
-    top: 20px;
-    right: 20px;
-    line-height: 5px;
+    right: 10px;
 }
 
 .user{

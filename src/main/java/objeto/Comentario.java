@@ -1,28 +1,27 @@
-
 package objeto;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 /**
  *
  * @author cesar31
  */
-public class Comentario {
-    
+public class Comentario implements Serializable{
+
     private int idComentario;
     private int idSuscripcion;
+    private int idRevista;
+    private String idUsuario;
     private String comentario;
-    private Date fecha;
-    private int idRecursivo;
-    private int edicionRevista;
+    private Date date;
 
-    public Comentario(int idComentario, int idSuscripcion, String comentario, Date fecha, int idRecursivo, int edicionRevista) {
-        this.idComentario = idComentario;
+    public Comentario(int idSuscripcion, String comentario, int idRevista, String idUsuario, Date date) {
         this.idSuscripcion = idSuscripcion;
         this.comentario = comentario;
-        this.fecha = fecha;
-        this.idRecursivo = idRecursivo;
-        this.edicionRevista = edicionRevista;
+        this.idRevista = idRevista;
+        this.idUsuario = idUsuario;
+        this.date = date;
     }
 
     public int getIdComentario() {
@@ -49,27 +48,32 @@ public class Comentario {
         this.comentario = comentario;
     }
 
-    public Date getFecha() {
-        return fecha;
+    public int getIdRevista() {
+        return idRevista;
     }
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
+    public void setIdRevista(int idRevista) {
+        this.idRevista = idRevista;
     }
 
-    public int getIdRecursivo() {
-        return idRecursivo;
+    public String getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setIdRecursivo(int idRecursivo) {
-        this.idRecursivo = idRecursivo;
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public int getEdicionRevista() {
-        return edicionRevista;
+    public Date getDate() {
+        return date;
     }
 
-    public void setEdicionRevista(int edicionRevista) {
-        this.edicionRevista = edicionRevista;
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "Comentario{" + "idSuscripcion=" + idSuscripcion + ", comentario=" + comentario + ", idRevista=" + idRevista + ", idUsuario=" + idUsuario + ", date=" + date + '}';
     }
 }
